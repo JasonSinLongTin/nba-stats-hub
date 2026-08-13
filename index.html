@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBA Hub</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- Auth screen ---------- */
+  #auth-screen {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 40px 32px;
+  }
+  #auth-screen h1 {
+    text-align: center;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    font-size: 24px;
+  }
+  #auth-screen .subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 28px;
+    font-size: 14px;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.15s;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: #1a73e8;
+  }
+  .btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary {
+    background: #1a73e8;
+    color: #fff;
+  }
+  .btn-primary:hover { background: #1557b0; }
+  .toggle-text {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: #666;
+  }
+  .toggle-text a {
+    color: #1a73e8;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .toggle-text a:hover { text-decoration: underline; }
+  .error-msg {
+    color: #d93025;
+    font-size: 13px;
+    margin-bottom: 12px;
+    min-height: 18px;
+  }
+  .success-msg {
+    color: #1e8e3e;
+    font-size: 13px;
+    margin-bottom: 12px;
+    min-height: 18px;
+  }
+
+  /* ---------- Home (post-login) ---------- */
+  #home-screen {
+    width: 100%;
+    min-height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+  }
+  .topbar .brand {
+    font-weight: 700;
+    color: #1a73e8;
+    font-size: 18px;
+  }
+  .topbar .user-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .topbar .welcome {
+    font-size: 14px;
+    color: #555;
+  }
+  .topbar .welcome b { color: #1a1a1a; }
+  .logout-btn {
+    padding: 7px 16px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #555;
+  }
+  .logout-btn:hover { background: #f5f5f5; }
+  .content {
+    flex: 1;
+    padding: 28px 32px 48px;
+    color: #1a1a1a;
+    font-size: 14px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ---------- Stat leaders ---------- */
+  .leaders-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .leader-card {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 14px rgba(26,115,232,0.25);
+  }
+  .leader-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  .leader-card .value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .leader-card .who {
+    font-size: 13px;
+    margin-top: 6px;
+    opacity: 0.95;
+  }
+
+  /* ---------- Controls ---------- */
+  .content h2 {
+    font-size: 20px;
+    margin-bottom: 14px;
+    color: #1a1a1a;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 220px;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .search-box input:focus { outline: none; border-color: #1a73e8; }
+  .search-box .icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 16px;
+  }
+  .select-wrap select {
+    padding: 11px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    cursor: pointer;
+  }
+  .select-wrap select:focus { outline: none; border-color: #1a73e8; }
+  .results-count {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 14px;
+  }
+
+  /* ---------- Player grid ---------- */
+  .player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .player-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  }
+  .player-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    border-color: #1a73e8;
+  }
+  .player-card .pc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .player-card .pc-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.3;
+  }
+  .player-card .pc-num {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+  .player-card .pc-team {
+    background: #1a73e8;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .player-card .pc-pos {
+    font-size: 11px;
+    color: #666;
+    background: #f0f4ff;
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-top: 4px;
+    display: inline-block;
+  }
+  .player-card .pc-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #f0f0f0;
+  }
+  .player-card .stat {
+    text-align: center;
+  }
+  .player-card .stat .sv {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  .player-card .stat .sl {
+    font-size: 10px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal {
+    background: #fff;
+    border-radius: 14px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 0;
+  }
+  .modal-head {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    color: #fff;
+    padding: 24px 28px;
+    border-radius: 14px 14px 0 0;
+    position: relative;
+  }
+  .modal-head .mh-name {
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .modal-head .mh-team {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 4px;
+  }
+  .modal-head .close-btn {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .modal-head .close-btn:hover { background: rgba(255,255,255,0.35); }
+  .modal-body { padding: 24px 28px; }
+  .modal-body .info-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .modal-body .info-item .il {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .modal-body .info-item .iv {
+    font-size: 15px;
+    color: #1a1a1a;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .modal-body h4 {
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+  .modal-body .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .modal-body .stat-box {
+    background: #f7f9fc;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .modal-body .stat-box .sv {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a73e8;
+  }
+  .modal-body .stat-box .sl {
+    font-size: 11px;
+    color: #888;
+    margin-top: 3px;
+  }
+
+  @media (max-width: 720px) {
+    .leaders-row { grid-template-columns: repeat(2, 1fr); }
+    .modal-body .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .topbar { padding: 14px 18px; }
+    .content { padding: 20px 18px 40px; }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH SCREEN ============ -->
+<div id="auth-screen">
+  <h1 id="auth-title">Log In</h1>
+  <p class="subtitle" id="auth-subtitle">Welcome back to NBA Hub</p>
+
+  <div id="error-msg" class="error-msg"></div>
+  <div id="success-msg" class="success-msg"></div>
+
+  <!-- Login form -->
+  <div id="login-form">
+    <div class="form-group">
+      <label for="login-username">Username</label>
+      <input type="text" id="login-username" autocomplete="username" placeholder="Enter username">
+    </div>
+    <div class="form-group">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" autocomplete="current-password" placeholder="Enter password">
+    </div>
+    <button class="btn btn-primary" id="login-btn">Log In</button>
+    <p class="toggle-text">Don't have an account? <a id="switch-to-register">Register</a></p>
+  </div>
+
+  <!-- Register form -->
+  <div id="register-form" class="hidden">
+    <div class="form-group">
+      <label for="reg-username">Username</label>
+      <input type="text" id="reg-username" autocomplete="username" placeholder="Choose a username">
+    </div>
+    <div class="form-group">
+      <label for="reg-password">Password</label>
+      <input type="password" id="reg-password" autocomplete="new-password" placeholder="Choose a password">
+    </div>
+    <div class="form-group">
+      <label for="reg-confirm">Confirm Password</label>
+      <input type="password" id="reg-confirm" autocomplete="new-password" placeholder="Re-enter password">
+    </div>
+    <button class="btn btn-primary" id="register-btn">Register</button>
+    <p class="toggle-text">Already have an account? <a id="switch-to-login">Log In</a></p>
+  </div>
+</div>
+
+<!-- ============ HOME SCREEN ============ -->
+<div id="home-screen" class="hidden">
+  <div class="topbar">
+    <div class="brand">NBA Hub</div>
+    <div class="user-area">
+      <span class="welcome">Hi, <b id="current-user"></b></span>
+      <button class="logout-btn" id="logout-btn">Log Out</button>
+    </div>
+  </div>
+  <div class="content">
+    <!-- Stat leaders -->
+    <h2>Stat Leaders</h2>
+    <div class="leaders-row" id="leaders-row"></div>
+
+    <!-- Players section -->
+    <h2>NBA Players</h2>
+    <div class="controls">
+      <div class="search-box">
+        <span class="icon">&#128269;</span>
+        <input type="text" id="search-input" placeholder="Search by player or team name...">
+      </div>
+      <div class="select-wrap">
+        <select id="team-filter">
+          <option value="">All Teams</option>
+        </select>
+      </div>
+      <div class="select-wrap">
+        <select id="pos-filter">
+          <option value="">All Positions</option>
+          <option value="PG">PG</option>
+          <option value="SG">SG</option>
+          <option value="SF">SF</option>
+          <option value="PF">PF</option>
+          <option value="C">C</option>
+        </select>
+      </div>
+      <div class="select-wrap">
+        <select id="sort-by">
+          <option value="name">Sort: Name (A-Z)</option>
+          <option value="ppg">Sort: Points (PPG)</option>
+          <option value="rpg">Sort: Rebounds (RPG)</option>
+          <option value="apg">Sort: Assists (APG)</option>
+          <option value="spg">Sort: Steals (SPG)</option>
+          <option value="bpg">Sort: Blocks (BPG)</option>
+          <option value="fg">Sort: FG %</option>
+          <option value="tp">Sort: 3P %</option>
+        </select>
+      </div>
+    </div>
+    <div class="results-count" id="results-count"></div>
+    <div class="player-grid" id="player-grid"></div>
+  </div>
+</div>
+
+<!-- ============ PLAYER MODAL ============ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const USERS_KEY = "nba_hub_users";
+  const SESSION_KEY = "nba_hub_session";
+
+  // ---------- Simple hash (not cryptographically secure, but avoids plaintext) ----------
+  function simpleHash(str) {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) + hash) + str.charCodeAt(i);
+      hash = hash & hash; // 32-bit
+    }
+    return String(hash);
+  }
+
+  function getUsers() {
+    try {
+      return JSON.parse(localStorage.getItem(USERS_KEY) || "{}");
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveUsers(users) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  }
+
+  // ---------- Element refs ----------
+  const authScreen = document.getElementById("auth-screen");
+  const homeScreen = document.getElementById("home-screen");
+  const authTitle = document.getElementById("auth-title");
+  const authSubtitle = document.getElementById("auth-subtitle");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const errorMsg = document.getElementById("error-msg");
+  const successMsg = document.getElementById("success-msg");
+
+  const loginUsername = document.getElementById("login-username");
+  const loginPassword = document.getElementById("login-password");
+  const regUsername = document.getElementById("reg-username");
+  const regPassword = document.getElementById("reg-password");
+  const regConfirm = document.getElementById("reg-confirm");
+
+  function clearMsgs() {
+    errorMsg.textContent = "";
+    successMsg.textContent = "";
+  }
+
+  function showError(msg) {
+    clearMsgs();
+    errorMsg.textContent = msg;
+  }
+
+  function showSuccess(msg) {
+    clearMsgs();
+    successMsg.textContent = msg;
+  }
+
+  // ---------- View switching ----------
+  function showLogin() {
+    authTitle.textContent = "Log In";
+    authSubtitle.textContent = "Welcome back to NBA Hub";
+    loginForm.classList.remove("hidden");
+    registerForm.classList.add("hidden");
+    clearMsgs();
+  }
+
+  function showRegister() {
+    authTitle.textContent = "Register";
+    authSubtitle.textContent = "Create your NBA Hub account";
+    registerForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
+    clearMsgs();
+  }
+
+  function showHome(username) {
+    authScreen.classList.add("hidden");
+    homeScreen.classList.remove("hidden");
+    document.getElementById("current-user").textContent = username;
+    if (window.renderNBA) window.renderNBA();
+  }
+
+  function showAuth() {
+    homeScreen.classList.add("hidden");
+    authScreen.classList.remove("hidden");
+    showLogin();
+    loginUsername.value = "";
+    loginPassword.value = "";
+    regUsername.value = "";
+    regPassword.value = "";
+    regConfirm.value = "";
+  }
+
+  // ---------- Register ----------
+  document.getElementById("register-btn").addEventListener("click", function () {
+    clearMsgs();
+    const username = regUsername.value.trim();
+    const password = regPassword.value;
+    const confirm = regConfirm.value;
+
+    if (!username) { showError("Please enter a username."); return; }
+    if (username.length < 3) { showError("Username must be at least 3 characters."); return; }
+    if (!password) { showError("Please enter a password."); return; }
+    if (password.length < 6) { showError("Password must be at least 6 characters."); return; }
+    if (password !== confirm) { showError("Passwords do not match."); return; }
+
+    const users = getUsers();
+    if (users[username]) {
+      showError("Username already exists. Please choose another.");
+      return;
+    }
+
+    users[username] = { passwordHash: simpleHash(password) };
+    saveUsers(users);
+    showSuccess("Account created! You can log in now.");
+
+    // Pre-fill login username and switch to login
+    loginUsername.value = username;
+    regUsername.value = "";
+    regPassword.value = "";
+    regConfirm.value = "";
+    setTimeout(showLogin, 800);
+  });
+
+  // ---------- Login ----------
+  document.getElementById("login-btn").addEventListener("click", function () {
+    clearMsgs();
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value;
+
+    if (!username) { showError("Please enter your username."); return; }
+    if (!password) { showError("Please enter your password."); return; }
+
+    const users = getUsers();
+    if (!users[username]) {
+      showError("User not found. Please register first.");
+      return;
+    }
+    if (users[username].passwordHash !== simpleHash(password)) {
+      showError("Incorrect password.");
+      return;
+    }
+
+    // Success — set session
+    localStorage.setItem(SESSION_KEY, username);
+    loginUsername.value = "";
+    loginPassword.value = "";
+    showHome(username);
+  });
+
+  // ---------- Logout ----------
+  document.getElementById("logout-btn").addEventListener("click", function () {
+    localStorage.removeItem(SESSION_KEY);
+    showAuth();
+  });
+
+  // ---------- Switch tabs ----------
+  document.getElementById("switch-to-register").addEventListener("click", showRegister);
+  document.getElementById("switch-to-login").addEventListener("click", showLogin);
+
+  // ---------- Enter key submits ----------
+  loginPassword.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("login-btn").click();
+  });
+  regConfirm.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("register-btn").click();
+  });
+
+  // ---------- Auto-login if session exists ----------
+  const sessionUser = localStorage.getItem(SESSION_KEY);
+  if (sessionUser && getUsers()[sessionUser]) {
+    showHome(sessionUser);
+  } else {
+    showAuth();
+  }
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Player dataset (2024-25 season, per-game stats) ----------
+  // Fields: name, team (abbr), teamName, pos, num, height, weight, age, exp, college,
+  //         ppg, rpg, apg, spg, bpg, fg, tp, ft, top
+  const PLAYERS = [
+    { name: "Shai Gilgeous-Alexander", team: "OKC", teamName: "Thunder", pos: "PG", num: 2, height: "6'6\"", weight: 195, age: 26, exp: 7, college: "Kentucky", ppg: 32.7, rpg: 5.0, apg: 6.2, spg: 2.0, bpg: 1.0, fg: 0.519, tp: 0.358, ft: 0.893, top: 2.3 },
+    { name: "Nikola Jokic", team: "DEN", teamName: "Nuggets", pos: "C", num: 15, height: "6'11\"", weight: 284, age: 30, exp: 10, college: "None", ppg: 29.6, rpg: 12.4, apg: 10.2, spg: 1.4, bpg: 0.9, fg: 0.578, tp: 0.413, ft: 0.822, top: 3.0 },
+    { name: "Giannis Antetokounmpo", team: "MIL", teamName: "Bucks", pos: "PF", num: 34, height: "6'11\"", weight: 243, age: 30, exp: 12, college: "None", ppg: 30.4, rpg: 11.9, apg: 6.5, spg: 1.2, bpg: 1.1, fg: 0.602, tp: 0.222, ft: 0.657, top: 3.4 },
+    { name: "Luka Doncic", team: "LAL", teamName: "Lakers", pos: "PG", num: 77, height: "6'6\"", weight: 230, age: 26, exp: 7, college: "None", ppg: 28.2, rpg: 8.2, apg: 8.2, spg: 1.9, bpg: 0.5, fg: 0.466, tp: 0.356, ft: 0.786, top: 3.5 },
+    { name: "Jayson Tatum", team: "BOS", teamName: "Celtics", pos: "SF", num: 0, height: "6'8\"", weight: 210, age: 27, exp: 8, college: "Duke", ppg: 26.8, rpg: 8.7, apg: 6.0, spg: 1.1, bpg: 0.6, fg: 0.453, tp: 0.346, ft: 0.812, top: 2.9 },
+    { name: "Anthony Edwards", team: "MIN", teamName: "Timberwolves", pos: "SG", num: 5, height: "6'4\"", weight: 225, age: 23, exp: 5, college: "Georgia", ppg: 27.6, rpg: 5.7, apg: 4.5, spg: 1.5, bpg: 0.6, fg: 0.461, tp: 0.397, ft: 0.835, top: 3.6 },
+    { name: "Jalen Brunson", team: "NYK", teamName: "Knicks", pos: "PG", num: 11, height: "6'2\"", weight: 190, age: 28, exp: 7, college: "Villanova", ppg: 26.0, rpg: 2.9, apg: 7.3, spg: 0.9, bpg: 0.2, fg: 0.479, tp: 0.383, ft: 0.847, top: 2.5 },
+    { name: "Devin Booker", team: "PHX", teamName: "Suns", pos: "SG", num: 1, height: "6'5\"", weight: 206, age: 28, exp: 10, college: "Kentucky", ppg: 27.1, rpg: 4.5, apg: 6.9, spg: 0.9, bpg: 0.4, fg: 0.467, tp: 0.366, ft: 0.884, top: 3.2 },
+    { name: "Donovan Mitchell", team: "CLE", teamName: "Cavaliers", pos: "SG", num: 45, height: "6'1\"", weight: 215, age: 28, exp: 8, college: "Louisville", ppg: 26.3, rpg: 5.1, apg: 5.0, spg: 1.4, bpg: 0.5, fg: 0.462, tp: 0.376, ft: 0.848, top: 2.8 },
+    { name: "Stephen Curry", team: "GSW", teamName: "Warriors", pos: "PG", num: 30, height: "6'2\"", weight: 185, age: 37, exp: 16, college: "Davidson", ppg: 24.5, rpg: 4.4, apg: 6.0, spg: 1.1, bpg: 0.4, fg: 0.448, tp: 0.397, ft: 0.923, top: 3.1 },
+    { name: "Kevin Durant", team: "PHX", teamName: "Suns", pos: "SF", num: 35, height: "6'11\"", weight: 240, age: 36, exp: 17, college: "Texas", ppg: 26.6, rpg: 6.0, apg: 4.2, spg: 0.8, bpg: 1.0, fg: 0.527, tp: 0.413, ft: 0.856, top: 3.3 },
+    { name: "LeBron James", team: "LAL", teamName: "Lakers", pos: "SF", num: 23, height: "6'9\"", weight: 250, age: 40, exp: 22, college: "None", ppg: 24.4, rpg: 7.8, apg: 8.2, spg: 1.0, bpg: 0.6, fg: 0.514, tp: 0.376, ft: 0.782, top: 3.7 },
+    { name: "Joel Embiid", team: "PHI", teamName: "76ers", pos: "C", num: 21, height: "7'0\"", weight: 280, age: 31, exp: 9, college: "Kansas", ppg: 32.5, rpg: 11.2, apg: 5.7, spg: 1.2, bpg: 1.6, fg: 0.529, tp: 0.388, ft: 0.883, top: 3.9 },
+    { name: "Tyrese Haliburton", team: "IND", teamName: "Pacers", pos: "PG", num: 0, height: "6'5\"", weight: 185, age: 24, exp: 5, college: "Iowa State", ppg: 20.5, rpg: 3.7, apg: 10.5, spg: 1.5, bpg: 0.7, fg: 0.472, tp: 0.386, ft: 0.853, top: 2.4 },
+    { name: "Anthony Davis", team: "DAL", teamName: "Mavericks", pos: "PF", num: 3, height: "6'10\"", weight: 253, age: 31, exp: 13, college: "Kentucky", ppg: 25.7, rpg: 12.0, apg: 3.5, spg: 1.2, bpg: 2.2, fg: 0.522, tp: 0.267, ft: 0.813, top: 2.4 },
+    { name: "Damian Lillard", team: "MIL", teamName: "Bucks", pos: "PG", num: 0, height: "6'2\"", weight: 195, age: 34, exp: 13, college: "Weber State", ppg: 24.3, rpg: 4.4, apg: 7.0, spg: 1.0, bpg: 0.2, fg: 0.424, tp: 0.370, ft: 0.921, top: 3.0 },
+    { name: "Paolo Banchero", team: "ORL", teamName: "Magic", pos: "PF", num: 5, height: "6'10\"", weight: 250, age: 22, exp: 3, college: "Duke", ppg: 25.0, rpg: 7.4, apg: 5.0, spg: 0.9, bpg: 0.7, fg: 0.453, tp: 0.339, ft: 0.725, top: 3.3 },
+    { name: "De'Aaron Fox", team: "SAS", teamName: "Spurs", pos: "PG", num: 4, height: "6'3\"", weight: 185, age: 27, exp: 8, college: "Kentucky", ppg: 25.2, rpg: 4.2, apg: 6.2, spg: 1.5, bpg: 0.5, fg: 0.469, tp: 0.323, ft: 0.735, top: 2.7 },
+    { name: "Victor Wembanyama", team: "SAS", teamName: "Spurs", pos: "C", num: 1, height: "7'3\"", weight: 210, age: 21, exp: 2, college: "None", ppg: 24.3, rpg: 11.0, apg: 3.7, spg: 1.2, bpg: 3.8, fg: 0.477, tp: 0.348, ft: 0.835, top: 3.4 },
+    { name: "Ja Morant", team: "MEM", teamName: "Grizzlies", pos: "PG", num: 12, height: "6'2\"", weight: 174, age: 25, exp: 6, college: "Murray State", ppg: 23.2, rpg: 4.1, apg: 7.3, spg: 1.2, bpg: 0.4, fg: 0.457, tp: 0.275, ft: 0.810, top: 3.4 },
+    { name: "Cade Cunningham", team: "DET", teamName: "Pistons", pos: "PG", num: 2, height: "6'6\"", weight: 220, age: 23, exp: 4, college: "Oklahoma State", ppg: 26.1, rpg: 6.1, apg: 9.1, spg: 1.0, bpg: 0.8, fg: 0.456, tp: 0.357, ft: 0.843, top: 4.1 },
+    { name: "Trae Young", team: "ATL", teamName: "Hawks", pos: "PG", num: 11, height: "6'1\"", weight: 164, age: 26, exp: 7, college: "Oklahoma", ppg: 24.2, rpg: 3.2, apg: 11.6, spg: 1.3, bpg: 0.2, fg: 0.411, tp: 0.345, ft: 0.857, top: 4.5 },
+    { name: "Pascal Siakam", team: "IND", teamName: "Pacers", pos: "PF", num: 43, height: "6'8\"", weight: 230, age: 30, exp: 9, college: "New Mexico State", ppg: 20.2, rpg: 6.9, apg: 3.4, spg: 0.9, bpg: 0.6, fg: 0.519, tp: 0.386, ft: 0.772, top: 2.1 },
+    { name: "Zion Williamson", team: "NOP", teamName: "Pelicans", pos: "PF", num: 1, height: "6'7\"", weight: 284, age: 24, exp: 5, college: "Duke", ppg: 24.6, rpg: 7.2, apg: 5.0, spg: 1.1, bpg: 0.6, fg: 0.567, tp: 0.286, ft: 0.712, top: 3.2 },
+    { name: "Bam Adebayo", team: "MIA", teamName: "Heat", pos: "C", num: 13, height: "6'9\"", weight: 255, age: 27, exp: 8, college: "Kentucky", ppg: 19.3, rpg: 10.4, apg: 4.0, spg: 1.1, bpg: 0.9, fg: 0.521, tp: 0.358, ft: 0.754, top: 2.6 },
+    { name: "Jaylen Brown", team: "BOS", teamName: "Celtics", pos: "SG", num: 7, height: "6'6\"", weight: 223, age: 28, exp: 9, college: "California", ppg: 23.0, rpg: 5.5, apg: 3.6, spg: 1.2, bpg: 0.4, fg: 0.497, tp: 0.354, ft: 0.703, top: 2.6 },
+    { name: "Karl-Anthony Towns", team: "NYK", teamName: "Knicks", pos: "C", num: 32, height: "6'11\"", weight: 248, age: 29, exp: 10, college: "Kentucky", ppg: 24.4, rpg: 12.6, apg: 3.1, spg: 0.7, bpg: 0.8, fg: 0.512, tp: 0.420, ft: 0.846, top: 2.7 },
+    { name: "Domantas Sabonis", team: "SAC", teamName: "Kings", pos: "C", num: 10, height: "6'10\"", weight: 240, age: 28, exp: 9, college: "Gonzaga", ppg: 19.4, rpg: 13.7, apg: 8.2, spg: 0.7, bpg: 0.5, fg: 0.613, tp: 0.417, ft: 0.745, top: 2.8 },
+    { name: "Evan Mobley", team: "CLE", teamName: "Cavaliers", pos: "C", num: 4, height: "6'11\"", weight: 215, age: 23, exp: 4, college: "USC", ppg: 18.5, rpg: 9.3, apg: 3.2, spg: 0.9, bpg: 1.4, fg: 0.556, tp: 0.370, ft: 0.714, top: 1.9 },
+    { name: "Franz Wagner", team: "ORL", teamName: "Magic", pos: "SF", num: 22, height: "6'10\"", weight: 220, age: 23, exp: 4, college: "Michigan", ppg: 24.4, rpg: 5.7, apg: 4.7, spg: 1.4, bpg: 0.6, fg: 0.469, tp: 0.292, ft: 0.798, top: 2.9 },
+    { name: "Tyler Herro", team: "MIA", teamName: "Heat", pos: "SG", num: 14, height: "6'5\"", weight: 195, age: 25, exp: 6, college: "Kentucky", ppg: 23.9, rpg: 5.3, apg: 5.5, spg: 0.9, bpg: 0.4, fg: 0.478, tp: 0.396, ft: 0.876, top: 2.6 },
+    { name: "Dejounte Murray", team: "NOP", teamName: "Pelicans", pos: "PG", num: 5, height: "6'5\"", weight: 200, age: 28, exp: 9, college: "Washington", ppg: 18.2, rpg: 6.2, apg: 6.5, spg: 1.4, bpg: 0.4, fg: 0.438, tp: 0.342, ft: 0.801, top: 2.7 },
+    { name: "Brandon Ingram", team: "TOR", teamName: "Raptors", pos: "SF", num: 14, height: "6'8\"", weight: 190, age: 27, exp: 9, college: "Duke", ppg: 22.2, rpg: 5.4, apg: 5.6, spg: 0.8, bpg: 0.5, fg: 0.491, tp: 0.354, ft: 0.811, top: 2.9 },
+    { name: "Lauri Markkanen", team: "UTA", teamName: "Jazz", pos: "PF", num: 23, height: "7'0\"", weight: 240, age: 27, exp: 8, college: "Arizona", ppg: 20.8, rpg: 6.6, apg: 2.2, spg: 0.9, bpg: 0.5, fg: 0.452, tp: 0.391, ft: 0.879, top: 1.7 },
+    { name: "Alperen Sengun", team: "HOU", teamName: "Rockets", pos: "C", num: 28, height: "6'11\"", weight: 243, age: 22, exp: 4, college: "None", ppg: 19.1, rpg: 10.3, apg: 4.9, spg: 1.1, bpg: 0.9, fg: 0.534, tp: 0.230, ft: 0.700, top: 3.0 },
+    { name: "Jalen Green", team: "HOU", teamName: "Rockets", pos: "SG", num: 4, height: "6'4\"", weight: 186, age: 22, exp: 4, college: "None", ppg: 21.0, rpg: 4.6, apg: 3.4, spg: 0.8, bpg: 0.3, fg: 0.431, tp: 0.354, ft: 0.813, top: 2.5 },
+    { name: "Scottie Barnes", team: "TOR", teamName: "Raptors", pos: "SF", num: 4, height: "6'7\"", weight: 225, age: 23, exp: 4, college: "Florida State", ppg: 19.3, rpg: 7.6, apg: 6.0, spg: 1.4, bpg: 0.9, fg: 0.452, tp: 0.347, ft: 0.781, top: 2.8 },
+    { name: "Deandre Ayton", team: "POR", teamName: "Trail Blazers", pos: "C", num: 2, height: "7'0\"", weight: 250, age: 26, exp: 7, college: "Arizona", ppg: 17.6, rpg: 10.5, apg: 1.6, spg: 0.8, bpg: 1.0, fg: 0.561, tp: 0.222, ft: 0.732, top: 1.7 },
+    { name: "Anfernee Simons", team: "POR", teamName: "Trail Blazers", pos: "PG", num: 1, height: "6'3\"", weight: 181, age: 25, exp: 6, college: "None", ppg: 19.3, rpg: 2.7, apg: 4.8, spg: 0.8, bpg: 0.2, fg: 0.425, tp: 0.364, ft: 0.881, top: 1.9 },
+    { name: "Jaren Jackson Jr.", team: "MEM", teamName: "Grizzlies", pos: "PF", num: 13, height: "6'11\"", weight: 242, age: 25, exp: 7, college: "Michigan State", ppg: 22.4, rpg: 5.6, apg: 2.2, spg: 1.2, bpg: 1.7, fg: 0.453, tp: 0.324, ft: 0.783, top: 2.2 },
+    { name: "LaMelo Ball", team: "CHA", teamName: "Hornets", pos: "PG", num: 1, height: "6'7\"", weight: 180, age: 23, exp: 5, college: "None", ppg: 26.0, rpg: 5.1, apg: 7.4, spg: 1.7, bpg: 0.4, fg: 0.414, tp: 0.345, ft: 0.876, top: 3.3 },
+    { name: "DeMar DeRozan", team: "SAC", teamName: "Kings", pos: "SF", num: 11, height: "6'6\"", weight: 220, age: 35, exp: 16, college: "USC", ppg: 22.2, rpg: 4.4, apg: 4.4, spg: 1.0, bpg: 0.5, fg: 0.479, tp: 0.328, ft: 0.847, top: 1.7 },
+    { name: "Zach LaVine", team: "CHI", teamName: "Bulls", pos: "SG", num: 8, height: "6'5\"", weight: 200, age: 30, exp: 11, college: "UCLA", ppg: 24.0, rpg: 4.3, apg: 4.6, spg: 0.9, bpg: 0.3, fg: 0.517, tp: 0.432, ft: 0.850, top: 2.1 },
+    { name: "Aaron Gordon", team: "DEN", teamName: "Nuggets", pos: "PF", num: 50, height: "6'8\"", weight: 235, age: 29, exp: 11, college: "Arizona", ppg: 14.6, rpg: 6.8, apg: 3.3, spg: 0.9, bpg: 0.8, fg: 0.556, tp: 0.293, ft: 0.659, top: 1.6 },
+    { name: "Jamal Murray", team: "DEN", teamName: "Nuggets", pos: "PG", num: 27, height: "6'4\"", weight: 215, age: 27, exp: 9, college: "Kentucky", ppg: 21.2, rpg: 4.0, apg: 6.5, spg: 1.0, bpg: 0.6, fg: 0.468, tp: 0.396, ft: 0.854, top: 2.6 },
+    { name: "Christian Wood", team: "LAL", teamName: "Lakers", pos: "C", num: 35, height: "6'10\"", weight: 214, age: 29, exp: 8, college: "UNLV", ppg: 11.8, rpg: 6.5, apg: 1.2, spg: 0.5, bpg: 0.8, fg: 0.521, tp: 0.358, ft: 0.768, top: 1.0 },
+    { name: "Austin Reaves", team: "LAL", teamName: "Lakers", pos: "SG", num: 15, height: "6'5\"", weight: 197, age: 26, exp: 4, college: "Oklahoma", ppg: 16.2, rpg: 4.4, apg: 5.3, spg: 0.8, bpg: 0.3, fg: 0.486, tp: 0.377, ft: 0.866, top: 1.9 },
+    { name: "Marcus Smart", team: "MEM", teamName: "Grizzlies", pos: "PG", num: 36, height: "6'3\"", weight: 220, age: 31, exp: 11, college: "Oklahoma State", ppg: 10.5, rpg: 2.5, apg: 4.6, spg: 1.4, bpg: 0.4, fg: 0.402, tp: 0.339, ft: 0.789, top: 1.8 },
+    { name: "Draymond Green", team: "GSW", teamName: "Warriors", pos: "PF", num: 23, height: "6'6\"", weight: 230, age: 35, exp: 13, college: "Michigan State", ppg: 8.6, rpg: 6.2, apg: 5.6, spg: 1.1, bpg: 0.8, fg: 0.489, tp: 0.320, ft: 0.725, top: 2.0 },
+    { name: "Klay Thompson", team: "DAL", teamName: "Mavericks", pos: "SG", num: 31, height: "6'6\"", weight: 220, age: 35, exp: 14, college: "Washington State", ppg: 16.4, rpg: 3.5, apg: 2.1, spg: 0.5, bpg: 0.4, fg: 0.438, tp: 0.388, ft: 0.875, top: 1.1 },
+    { name: "Kyrie Irving", team: "DAL", teamName: "Mavericks", pos: "PG", num: 11, height: "6'2\"", weight: 195, age: 33, exp: 14, college: "Duke", ppg: 24.7, rpg: 4.8, apg: 4.8, spg: 1.2, bpg: 0.5, fg: 0.473, tp: 0.401, ft: 0.905, top: 1.9 },
+    { name: "Brandon Miller", team: "CHA", teamName: "Hornets", pos: "SF", num: 24, height: "6'7\"", weight: 200, age: 22, exp: 2, college: "Alabama", ppg: 21.0, rpg: 4.9, apg: 3.6, spg: 0.9, bpg: 0.5, fg: 0.441, tp: 0.371, ft: 0.854, top: 2.2 },
+    { name: "Tobias Harris", team: "DET", teamName: "Pistons", pos: "PF", num: 12, height: "6'8\"", weight: 226, age: 32, exp: 14, college: "Tennessee", ppg: 13.7, rpg: 6.3, apg: 2.4, spg: 0.7, bpg: 0.5, fg: 0.488, tp: 0.351, ft: 0.826, top: 1.3 },
+    { name: "Chet Holmgren", team: "OKC", teamName: "Thunder", pos: "C", num: 7, height: "7'1\"", weight: 195, age: 22, exp: 2, college: "Gonzaga", ppg: 16.5, rpg: 8.3, apg: 2.4, spg: 1.0, bpg: 2.3, fg: 0.510, tp: 0.379, ft: 0.793, top: 1.6 },
+    { name: "Jalen Williams", team: "OKC", teamName: "Thunder", pos: "SF", num: 8, height: "6'6\"", weight: 211, age: 23, exp: 3, college: "Santa Clara", ppg: 21.6, rpg: 5.3, apg: 5.1, spg: 1.6, bpg: 0.8, fg: 0.542, tp: 0.396, ft: 0.813, top: 2.0 },
+    { name: "Derrick White", team: "BOS", teamName: "Celtics", pos: "PG", num: 9, height: "6'4\"", weight: 190, age: 30, exp: 8, college: "Colorado", ppg: 15.2, rpg: 4.2, apg: 5.2, spg: 1.0, bpg: 1.2, fg: 0.461, tp: 0.396, ft: 0.901, top: 1.5 },
+    { name: "Mikal Bridges", team: "NYK", teamName: "Knicks", pos: "SF", num: 25, height: "6'6\"", weight: 209, age: 28, exp: 7, college: "Villanova", ppg: 17.0, rpg: 4.1, apg: 3.6, spg: 1.0, bpg: 0.4, fg: 0.434, tp: 0.370, ft: 0.833, top: 1.6 },
+    { name: "OG Anunoby", team: "NYK", teamName: "Knicks", pos: "SF", num: 8, height: "6'7\"", weight: 240, age: 27, exp: 8, college: "Indiana", ppg: 14.7, rpg: 4.8, apg: 2.1, spg: 1.4, bpg: 0.8, fg: 0.482, tp: 0.364, ft: 0.773, top: 1.1 },
+    { name: "Rudy Gobert", team: "MIN", teamName: "Timberwolves", pos: "C", num: 27, height: "7'1\"", weight: 245, age: 32, exp: 12, college: "None", ppg: 14.0, rpg: 12.5, apg: 1.5, spg: 0.7, bpg: 1.8, fg: 0.659, tp: 0.000, ft: 0.663, top: 1.7 },
+    { name: "Julius Randle", team: "MIN", teamName: "Timberwolves", pos: "PF", num: 30, height: "6'8\"", weight: 250, age: 30, exp: 11, college: "Kentucky", ppg: 21.0, rpg: 7.0, apg: 4.1, spg: 0.6, bpg: 0.4, fg: 0.478, tp: 0.312, ft: 0.806, top: 2.7 },
+    { name: "P.J. Washington", team: "DAL", teamName: "Mavericks", pos: "PF", num: 25, height: "6'7\"", weight: 230, age: 26, exp: 6, college: "Kentucky", ppg: 14.0, rpg: 6.6, apg: 2.2, spg: 1.0, bpg: 0.8, fg: 0.453, tp: 0.330, ft: 0.763, top: 1.4 },
+    { name: "Tyrese Maxey", team: "PHI", teamName: "76ers", pos: "PG", num: 0, height: "6'2\"", weight: 200, age: 24, exp: 5, college: "Kentucky", ppg: 26.3, rpg: 3.7, apg: 6.1, spg: 1.0, bpg: 0.5, fg: 0.451, tp: 0.373, ft: 0.871, top: 1.7 },
+    { name: "Paul George", team: "PHI", teamName: "76ers", pos: "SF", num: 8, height: "6'8\"", weight: 220, age: 34, exp: 15, college: "Fresno State", ppg: 22.6, rpg: 5.2, apg: 3.5, spg: 1.5, bpg: 0.5, fg: 0.473, tp: 0.413, ft: 0.907, top: 3.1 },
+    { name: "Clint Capela", team: "ATL", teamName: "Hawks", pos: "C", num: 15, height: "6'10\"", weight: 240, age: 30, exp: 11, college: "None", ppg: 9.5, rpg: 8.6, apg: 1.0, spg: 0.6, bpg: 1.1, fg: 0.583, tp: 0.000, ft: 0.617, top: 1.4 },
+    { name: "Jalen Johnson", team: "ATL", teamName: "Hawks", pos: "PF", num: 1, height: "6'9\"", weight: 219, age: 23, exp: 4, college: "Duke", ppg: 18.8, rpg: 10.0, apg: 5.0, spg: 1.2, bpg: 0.9, fg: 0.505, tp: 0.293, ft: 0.731, top: 2.4 },
+    { name: "Nic Claxton", team: "BKN", teamName: "Nets", pos: "C", num: 33, height: "6'11\"", weight: 215, age: 25, exp: 6, college: "Georgia", ppg: 11.3, rpg: 8.8, apg: 2.5, spg: 0.7, bpg: 1.5, fg: 0.627, tp: 0.000, ft: 0.586, top: 1.5 },
+    { name: "Cam Thomas", team: "BKN", teamName: "Nets", pos: "SG", num: 24, height: "6'4\"", weight: 210, age: 23, exp: 4, college: "LSU", ppg: 22.5, rpg: 3.2, apg: 3.1, spg: 0.7, bpg: 0.2, fg: 0.439, tp: 0.363, ft: 0.872, top: 2.3 },
+    { name: "Myles Turner", team: "IND", teamName: "Pacers", pos: "C", num: 33, height: "6'11\"", weight: 250, age: 28, exp: 10, college: "Texas", ppg: 15.6, rpg: 6.5, apg: 1.5, spg: 0.8, bpg: 1.9, fg: 0.488, tp: 0.358, ft: 0.819, top: 1.2 },
+    { name: "Darius Garland", team: "CLE", teamName: "Cavaliers", pos: "PG", num: 10, height: "6'2\"", weight: 190, age: 25, exp: 6, college: "Vanderbilt", ppg: 20.6, rpg: 2.9, apg: 6.5, spg: 1.3, bpg: 0.2, fg: 0.470, tp: 0.402, ft: 0.850, top: 2.7 },
+    { name: "Kyle Kuzma", team: "WAS", teamName: "Wizards", pos: "PF", num: 18, height: "6'9\"", weight: 221, age: 29, exp: 8, college: "Utah", ppg: 18.5, rpg: 6.5, apg: 3.8, spg: 0.7, bpg: 0.6, fg: 0.458, tp: 0.329, ft: 0.737, top: 2.6 },
+    { name: "Jordan Poole", team: "WAS", teamName: "Wizards", pos: "SG", num: 13, height: "6'4\"", weight: 197, age: 25, exp: 6, college: "Michigan", ppg: 18.0, rpg: 3.4, apg: 4.4, spg: 1.1, bpg: 0.3, fg: 0.414, tp: 0.351, ft: 0.877, top: 2.5 },
+    { name: "Coby White", team: "CHI", teamName: "Bulls", pos: "PG", num: 0, height: "6'5\"", weight: 190, age: 24, exp: 6, college: "North Carolina", ppg: 19.1, rpg: 4.5, apg: 5.1, spg: 0.7, bpg: 0.3, fg: 0.447, tp: 0.378, ft: 0.833, top: 1.9 },
+    { name: "Nikola Vucevic", team: "CHI", teamName: "Bulls", pos: "C", num: 29, height: "6'10\"", weight: 260, age: 34, exp: 14, college: "USC", ppg: 18.0, rpg: 10.1, apg: 3.3, spg: 0.7, bpg: 0.7, fg: 0.538, tp: 0.401, ft: 0.772, top: 1.7 },
+    { name: "Immanuel Quickley", team: "TOR", teamName: "Raptors", pos: "PG", num: 5, height: "6'3\"", weight: 188, age: 25, exp: 5, college: "Kentucky", ppg: 17.2, rpg: 3.8, apg: 5.8, spg: 0.8, bpg: 0.3, fg: 0.429, tp: 0.380, ft: 0.868, top: 1.9 },
+    { name: "RJ Barrett", team: "TOR", teamName: "Raptors", pos: "SF", num: 9, height: "6'6\"", weight: 235, age: 24, exp: 6, college: "Duke", ppg: 21.8, rpg: 6.4, apg: 5.5, spg: 0.9, bpg: 0.3, fg: 0.488, tp: 0.357, ft: 0.712, top: 2.7 },
+    { name: "Collin Sexton", team: "UTA", teamName: "Jazz", pos: "PG", num: 2, height: "6'1\"", weight: 190, age: 26, exp: 7, college: "Alabama", ppg: 18.4, rpg: 2.9, apg: 4.2, spg: 0.8, bpg: 0.2, fg: 0.487, tp: 0.392, ft: 0.859, top: 1.9 },
+    { name: "Walker Kessler", team: "UTA", teamName: "Jazz", pos: "C", num: 24, height: "7'1\"", weight: 245, age: 23, exp: 3, college: "Auburn", ppg: 8.1, rpg: 7.5, apg: 0.9, spg: 0.5, bpg: 2.4, fg: 0.654, tp: 0.000, ft: 0.516, top: 0.9 },
+    { name: "Fred VanVleet", team: "HOU", teamName: "Rockets", pos: "PG", num: 5, height: "6'0\"", weight: 197, age: 30, exp: 9, college: "Wichita State", ppg: 14.8, rpg: 3.7, apg: 8.1, spg: 1.6, bpg: 0.5, fg: 0.410, tp: 0.350, ft: 0.862, top: 2.0 },
+    { name: "Dillon Brooks", team: "HOU", teamName: "Rockets", pos: "SF", num: 9, height: "6'6\"", weight: 225, age: 28, exp: 8, college: "Oregon", ppg: 14.0, rpg: 3.7, apg: 1.7, spg: 0.8, bpg: 0.3, fg: 0.428, tp: 0.359, ft: 0.840, top: 1.4 },
+    { name: "Devin Vassell", team: "SAS", teamName: "Spurs", pos: "SG", num: 24, height: "6'5\"", weight: 200, age: 24, exp: 5, college: "Florida State", ppg: 17.8, rpg: 4.0, apg: 3.5, spg: 1.2, bpg: 0.5, fg: 0.453, tp: 0.372, ft: 0.800, top: 1.7 },
+    { name: "Chris Paul", team: "SAS", teamName: "Spurs", pos: "PG", num: 3, height: "6'0\"", weight: 175, age: 40, exp: 20, college: "Wake Forest", ppg: 9.2, rpg: 3.7, apg: 7.4, spg: 1.2, bpg: 0.1, fg: 0.457, tp: 0.376, ft: 0.930, top: 1.5 },
+    { name: "Andrew Nembhard", team: "IND", teamName: "Pacers", pos: "PG", num: 2, height: "6'5\"", weight: 193, age: 25, exp: 3, college: "Gonzaga", ppg: 10.0, rpg: 3.0, apg: 5.5, spg: 1.1, bpg: 0.2, fg: 0.464, tp: 0.349, ft: 0.769, top: 1.4 }
+  ];
+
+  // ---------- Element refs ----------
+  const grid = document.getElementById("player-grid");
+  const leadersRow = document.getElementById("leaders-row");
+  const searchInput = document.getElementById("search-input");
+  const teamFilter = document.getElementById("team-filter");
+  const posFilter = document.getElementById("pos-filter");
+  const sortBy = document.getElementById("sort-by");
+  const resultsCount = document.getElementById("results-count");
+  const modalOverlay = document.getElementById("modal-overlay");
+  const modal = document.getElementById("modal");
+
+  let currentList = PLAYERS.slice();
+
+  // ---------- Populate team filter ----------
+  function populateTeamFilter() {
+    const teams = {};
+    PLAYERS.forEach(function (p) {
+      if (!teams[p.team]) teams[p.team] = p.teamName;
+    });
+    const sorted = Object.keys(teams).sort(function (a, b) {
+      return teams[a].localeCompare(teams[b]);
+    });
+    sorted.forEach(function (abbr) {
+      const opt = document.createElement("option");
+      opt.value = abbr;
+      opt.textContent = teams[abbr] + " (" + abbr + ")";
+      teamFilter.appendChild(opt);
+    });
+  }
+
+  // ---------- Stat leaders ----------
+  function renderLeaders() {
+    const cats = [
+      { key: "ppg", label: "Points Per Game", suffix: "" },
+      { key: "rpg", label: "Rebounds Per Game", suffix: "" },
+      { key: "apg", label: "Assists Per Game", suffix: "" },
+      { key: "bpg", label: "Blocks Per Game", suffix: "" }
+    ];
+    leadersRow.innerHTML = "";
+    cats.forEach(function (cat) {
+      let best = PLAYERS[0];
+      PLAYERS.forEach(function (p) {
+        if (p[cat.key] > best[cat.key]) best = p;
+      });
+      const card = document.createElement("div");
+      card.className = "leader-card";
+      card.innerHTML =
+        '<div class="label">' + cat.label + "</div>" +
+        '<div class="value">' + best[cat.key].toFixed(1) + "</div>" +
+        '<div class="who">' + best.name + " &middot; " + best.team + "</div>";
+      leadersRow.appendChild(card);
+    });
+  }
+
+  // ---------- Helpers ----------
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+    });
+  }
+  function pct(v) { return (v * 100).toFixed(1) + "%"; }
+
+  // ---------- Render player cards ----------
+  function render() {
+    const q = searchInput.value.trim().toLowerCase();
+    const tf = teamFilter.value;
+    const pf = posFilter.value;
+    const sb = sortBy.value;
+
+    currentList = PLAYERS.filter(function (p) {
+      if (tf && p.team !== tf) return false;
+      if (pf && p.pos !== pf) return false;
+      if (q) {
+        const hay = (p.name + " " + p.team + " " + p.teamName).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    currentList.sort(function (a, b) {
+      if (sb === "name") return a.name.localeCompare(b.name);
+      return b[sb] - a[sb];
+    });
+
+    grid.innerHTML = "";
+    if (currentList.length === 0) {
+      grid.innerHTML = '<div class="empty-state">No players match your search.</div>';
+      resultsCount.textContent = "0 players found";
+      return;
+    }
+
+    resultsCount.textContent = currentList.length + " player" + (currentList.length === 1 ? "" : "s") + " found";
+
+    currentList.forEach(function (p, idx) {
+      const card = document.createElement("div");
+      card.className = "player-card";
+      card.innerHTML =
+        '<div class="pc-head">' +
+          '<div>' +
+            '<div class="pc-name">' + esc(p.name) + "</div>" +
+            '<div class="pc-num">#' + p.num + " &middot; " + p.pos + "</div>" +
+          "</div>" +
+          '<div class="pc-team">' + esc(p.team) + "</div>" +
+        "</div>" +
+        '<div class="pc-pos">' + esc(p.teamName) + "</div>" +
+        '<div class="pc-stats">' +
+          '<div class="stat"><div class="sv">' + p.ppg.toFixed(1) + '</div><div class="sl">PPG</div></div>' +
+          '<div class="stat"><div class="sv">' + p.rpg.toFixed(1) + '</div><div class="sl">RPG</div></div>' +
+          '<div class="stat"><div class="sv">' + p.apg.toFixed(1) + '</div><div class="sl">APG</div></div>' +
+        "</div>";
+      card.addEventListener("click", function () { openModal(p); });
+      grid.appendChild(card);
+    });
+  }
+
+  // ---------- Modal ----------
+  function openModal(p) {
+    modal.innerHTML =
+      '<div class="modal-head">' +
+        '<button class="close-btn" id="modal-close">&times;</button>' +
+        '<div class="mh-name">' + esc(p.name) + "</div>" +
+        '<div class="mh-team">' + p.teamName + " (" + p.team + ") &middot; #" + p.num + " &middot; " + p.pos + "</div>" +
+      "</div>" +
+      '<div class="modal-body">' +
+        '<div class="info-row">' +
+          '<div class="info-item"><div class="il">Height</div><div class="iv">' + p.height + " &middot; " + p.weight + " lb</div></div>" +
+          '<div class="info-item"><div class="il">Age</div><div class="iv">' + p.age + " years</div></div>" +
+          '<div class="info-item"><div class="il">Experience</div><div class="iv">' + p.exp + " year" + (p.exp === 1 ? "" : "s") + "</div></div>" +
+          '<div class="info-item"><div class="il">College</div><div class="iv">' + esc(p.college) + "</div></div>" +
+        "</div>" +
+        '<h4>Per-Game Stats</h4>' +
+        '<div class="stat-grid">' +
+          '<div class="stat-box"><div class="sv">' + p.ppg.toFixed(1) + '</div><div class="sl">Points</div></div>' +
+          '<div class="stat-box"><div class="sv">' + p.rpg.toFixed(1) + '</div><div class="sl">Rebounds</div></div>' +
+          '<div class="stat-box"><div class="sv">' + p.apg.toFixed(1) + '</div><div class="sl">Assists</div></div>' +
+          '<div class="stat-box"><div class="sv">' + p.spg.toFixed(1) + '</div><div class="sl">Steals</div></div>' +
+          '<div class="stat-box"><div class="sv">' + p.bpg.toFixed(1) + '</div><div class="sl">Blocks</div></div>' +
+          '<div class="stat-box"><div class="sv">' + p.top.toFixed(1) + '</div><div class="sl">Turnovers</div></div>' +
+        "</div>" +
+        '<h4 style="margin-top:20px;">Shooting Splits</h4>' +
+        '<div class="stat-grid">' +
+          '<div class="stat-box"><div class="sv">' + pct(p.fg) + '</div><div class="sl">FG %</div></div>' +
+          '<div class="stat-box"><div class="sv">' + pct(p.tp) + '</div><div class="sl">3P %</div></div>' +
+          '<div class="stat-box"><div class="sv">' + pct(p.ft) + '</div><div class="sl">FT %</div></div>' +
+        "</div>" +
+      "</div>";
+    modalOverlay.classList.add("show");
+    document.getElementById("modal-close").addEventListener("click", closeModal);
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove("show");
+  }
+
+  modalOverlay.addEventListener("click", function (e) {
+    if (e.target === modalOverlay) closeModal();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeModal();
+  });
+
+  // ---------- Wire up controls ----------
+  searchInput.addEventListener("input", render);
+  teamFilter.addEventListener("change", render);
+  posFilter.addEventListener("change", render);
+  sortBy.addEventListener("change", render);
+
+  // ---------- Init ----------
+  populateTeamFilter();
+  renderLeaders();
+
+  // Expose render so the auth flow can trigger it on login
+  window.renderNBA = function () {
+    render();
+    renderLeaders();
+  };
+
+  // If home is already visible (auto-login ran before this script), render now
+  if (!document.getElementById("home-screen").classList.contains("hidden")) {
+    render();
+  }
+})();
+</script>
+</body>
+</html>
