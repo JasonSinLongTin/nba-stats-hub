@@ -533,6 +533,84 @@
     text-decoration: underline;
     margin-left: auto;
   }
+
+  /* ---------- Import / Export ---------- */
+  .transfer-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #eaecef;
+  }
+  .transfer-actions button {
+    flex: 1;
+    min-width: 140px;
+    padding: 9px 12px;
+    font-size: 13px;
+    border-radius: 7px;
+    border: 1px solid #d0d7de;
+    background: #f7f9fc;
+    color: #333;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .transfer-actions button:hover { background: #eef3f9; border-color: #1a73e8; color: #1a73e8; }
+
+  .transfer-panel {
+    display: none;
+    margin-top: 14px;
+    padding: 14px;
+    background: #f7f9fc;
+    border: 1px solid #e3e8ef;
+    border-radius: 9px;
+  }
+  .transfer-panel.open { display: block; }
+  .transfer-panel label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .transfer-panel textarea {
+    width: 100%;
+    min-height: 84px;
+    padding: 9px 11px;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  .transfer-panel textarea:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
+  .transfer-panel .tp-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .transfer-panel .tp-actions button {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 13px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .tp-copy, .tp-do-import { background: #1a73e8; color: #fff; }
+  .tp-copy:hover, .tp-do-import:hover { background: #1557b0; }
+  .tp-close { background: #eaecef; color: #555; }
+  .tp-close:hover { background: #dde1e6; }
+
+  .mini-note {
+    font-size: 11px;
+    color: #888;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
 </style>
 
 <!-- ============ FIREBASE SDK ============ -->
@@ -609,6 +687,33 @@ try {
     <button class="btn btn-primary" id="register-btn">Register</button>
     <p class="toggle-text">Already have an account? <a id="switch-to-login">Log In</a></p>
   </div>
+
+  <!-- Import / Export actions -->
+  <div class="transfer-actions">
+    <button id="btn-show-export">&#8593; Export My Account</button>
+    <button id="btn-show-import">&#8595; Import Account</button>
+  </div>
+
+  <!-- Export panel -->
+  <div class="transfer-panel" id="export-panel">
+    <label>Your account code — copy and paste this on any other browser/device:</label>
+    <textarea id="export-code" readonly></textarea>
+    <p class="mini-note">This code contains your username + encrypted password hash. Anyone who has it can import your account, so keep it private like a password.</p>
+    <div class="tp-actions">
+      <button class="tp-copy" id="btn-copy-code">&#128203; Copy to Clipboard</button>
+      <button class="tp-close" data-close="export-panel">Close</button>
+    </div>
+  </div>
+
+  <!-- Import panel -->
+  <div class="transfer-panel" id="import-panel">
+    <label>Paste your account code below to import:</label>
+    <textarea id="import-code" placeholder="Paste export code here..."></textarea>
+    <div class="tp-actions">
+      <button class="tp-do-import" id="btn-do-import">&#10003; Import Account</button>
+      <button class="tp-close" data-close="import-panel">Close</button>
+    </div>
+  </div>
 </div>
 
 <!-- ============ HOME SCREEN ============ -->
@@ -616,6 +721,7 @@ try {
   <div class="topbar">
     <div class="brand">NBA Hub</div>
     <div class="user-area">
+      <button class="logout-btn" id="export-btn" title="Export your account to use on other devices/browsers" style="background:#f7f9fc;color:#1a73e8;border:1px solid #cfe0fb;margin-right:8px;">&#8593; Export</button>
       <span class="welcome">Hi, <b id="current-user"></b></span>
       <button class="logout-btn" id="logout-btn">Log Out</button>
     </div>
@@ -949,6 +1055,28 @@ try {
     }
   });
 
+  // ---------- Export from inside the app ----------
+  var exportBtnInApp = document.getElementById("export-btn");
+  if (exportBtnInApp) {
+    exportBtnInApp.addEventListener("click", function () {
+      // Jump to auth screen and open the export panel directly
+      homeScreen.classList.add("hidden");
+      authScreen.classList.remove("hidden");
+      showLogin();
+      setTimeout(function () {
+        clearMsgs();
+        var code = exportCodeGenerate();
+        if (code) {
+          exportCodeArea.value = code;
+          exportPanel.classList.add("open");
+          importPanel.classList.remove("open");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          showSuccess("Here's your account code. Copy it to use your account on any other browser or device.");
+        }
+      }, 50);
+    });
+  }
+
   // ---------- Logout ----------
   document.getElementById("logout-btn").addEventListener("click", function () {
     localStorage.removeItem(SESSION_KEY);
@@ -982,6 +1110,143 @@ try {
   }
 
   updateModeUI();
+
+  // ---------- Import / Export (cross-browser account transfer) ----------
+  const TRANSFER_MAGIC = "NBA2k|";
+
+  function exportCodeGenerate() {
+    // Export all registered local users so any of them can be logged into after import
+    var users = getUsers();
+    var sessionUser = localStorage.getItem(SESSION_KEY);
+    if (Object.keys(users).length === 0) {
+      showError("No local accounts to export yet. Register at least one account first.");
+      return null;
+    }
+    try {
+      var payload = { v: 1, u: users };
+      if (sessionUser) payload.s = sessionUser;
+      var json = JSON.stringify(payload);
+      var b64 = btoa(unescape(encodeURIComponent(json)));
+      return TRANSFER_MAGIC + b64;
+    } catch (e) {
+      showError("Failed to generate export code: " + e.message);
+      return null;
+    }
+  }
+
+  function exportCodeParse(code) {
+    if (typeof code !== "string") return null;
+    code = code.trim();
+    if (code.indexOf(TRANSFER_MAGIC) !== 0) {
+      // Try stripping leading/trailing quotes just in case
+      code = code.replace(/^["'\s]+|["'\s]+$/g, "");
+      if (code.indexOf(TRANSFER_MAGIC) !== 0) return null;
+    }
+    var b64 = code.substring(TRANSFER_MAGIC.length);
+    try {
+      var json = decodeURIComponent(escape(atob(b64)));
+      var payload = JSON.parse(json);
+      if (!payload || typeof payload.u !== "object") return null;
+      return payload;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const exportPanel = document.getElementById("export-panel");
+  const importPanel = document.getElementById("import-panel");
+  const exportCodeArea = document.getElementById("export-code");
+  const importCodeArea = document.getElementById("import-code");
+
+  document.getElementById("btn-show-export").addEventListener("click", function () {
+    clearMsgs();
+    importPanel.classList.remove("open");
+    var code = exportCodeGenerate();
+    if (code) {
+      exportCodeArea.value = code;
+      exportPanel.classList.add("open");
+      exportCodeArea.focus();
+      exportCodeArea.select();
+    }
+  });
+
+  document.getElementById("btn-show-import").addEventListener("click", function () {
+    clearMsgs();
+    exportPanel.classList.remove("open");
+    importPanel.classList.toggle("open");
+    if (importPanel.classList.contains("open")) importCodeArea.focus();
+  });
+
+  document.querySelectorAll(".tp-close").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var id = btn.getAttribute("data-close");
+      document.getElementById(id).classList.remove("open");
+    });
+  });
+
+  document.getElementById("btn-copy-code").addEventListener("click", function () {
+    var btn = document.getElementById("btn-copy-code");
+    if (!exportCodeArea.value) return;
+    try {
+      exportCodeArea.select();
+      document.execCommand("copy");
+      var old = btn.textContent;
+      btn.textContent = "\u2713 Copied!";
+      setTimeout(function () { btn.textContent = old; }, 1800);
+    } catch (e) {
+      showError("Clipboard copy blocked. Please select and copy manually.");
+    }
+  });
+
+  document.getElementById("btn-do-import").addEventListener("click", function () {
+    clearMsgs();
+    var raw = importCodeArea.value;
+    if (!raw.trim()) { showError("Please paste your export code first."); return; }
+    var payload = exportCodeParse(raw);
+    if (!payload) {
+      showError("Invalid account code. Make sure you copied the entire code exactly.");
+      return;
+    }
+    var users = getUsers();
+    var merged = 0;
+    var skipped = 0;
+    Object.keys(payload.u).forEach(function (name) {
+      if (!users[name]) {
+        users[name] = payload.u[name];
+        merged++;
+      } else if (users[name].passwordHash !== payload.u[name].passwordHash) {
+        // Different version — keep newer behavior: import overwrites (user explicitly imported)
+        users[name] = payload.u[name];
+        merged++;
+      } else {
+        skipped++;
+      }
+    });
+    saveUsers(users);
+    exportPanel.classList.remove("open");
+    importPanel.classList.remove("open");
+    importCodeArea.value = "";
+
+    // Auto-login with the session user if specified in payload, otherwise prompt to login
+    var autoUser = payload.s && getUsers()[payload.s] ? payload.s : null;
+    if (!autoUser) {
+      // If there's only one account being imported, also auto-login
+      var names = Object.keys(payload.u);
+      if (names.length === 1) autoUser = names[0];
+    }
+
+    var msg = "Account imported successfully (" + merged + (merged === 1 ? " account" : " accounts");
+    if (skipped > 0) msg += ", " + skipped + " already existed";
+    msg += ").";
+
+    if (autoUser) {
+      localStorage.setItem(SESSION_KEY, autoUser);
+      showSuccess(msg + " Logged in as " + autoUser + ".");
+      setTimeout(function () { showHome(autoUser); }, 900);
+    } else {
+      showSuccess(msg + " You can now log in with the imported username.");
+    }
+  });
 
   if (authMode === "cloud" && firebaseConfigured()) {
     // Listen for Firebase auth state changes (real session across devices)
