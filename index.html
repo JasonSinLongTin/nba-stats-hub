@@ -427,6 +427,88 @@
   }
 
   .hidden { display: none !important; }
+
+  /* ---------- Loading & status ---------- */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #666;
+  }
+  .status-bar .refresh-btn {
+    padding: 7px 14px;
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .status-bar .refresh-btn:hover { background: #1557b0; }
+  .status-bar .refresh-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .status-bar .refresh-btn.spinning { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status-bar .last-updated { color: #888; }
+  .status-bar .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .status-bar .dot-live { background: #1e8e3e; animation: pulse 2s infinite; }
+  .status-bar .dot-fallback { background: #f9ab00; }
+  .status-bar .dot-error { background: #d93025; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .loading-spinner {
+    text-align: center;
+    padding: 60px 20px;
+    color: #888;
+  }
+  .loading-spinner .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #1a73e8;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* ---------- Player card with logo ---------- */
+  .player-card .pc-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f0f0f0;
+  }
+  .player-card .pc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .player-card .pc-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .data-source-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-weight: 600;
+  }
+  .badge-live { background: #e6f4ea; color: #1e8e3e; }
+  .badge-cache { background: #fef7e0; color: #f9ab00; }
+  .badge-static { background: #e8eaed; color: #5f6368; }
 </style>
 </head>
 <body>
@@ -520,6 +602,11 @@
           <option value="tp">Sort: 3P %</option>
         </select>
       </div>
+    </div>
+    <div class="status-bar" id="status-bar">
+      <button class="refresh-btn" id="refresh-btn">&#8635; Refresh</button>
+      <span class="status-dot dot-live" id="status-dot"></span>
+      <span class="last-updated" id="last-updated">Loading...</span>
     </div>
     <div class="results-count" id="results-count"></div>
     <div class="player-grid" id="player-grid"></div>
@@ -715,9 +802,22 @@
 (function () {
   "use strict";
 
-  // ---------- Player dataset (2024-25 season, per-game stats) ----------
-  // Fields: name, team (abbr), teamName, pos, num, height, weight, age, exp, college,
-  //         ppg, rpg, apg, spg, bpg, fg, tp, ft, top
+  // ---------- API Configuration ----------
+  const API_CFG = {
+    key: "b4065c301emshb93047d0b159c1fp160ffejsnda0d82e06d03",
+    host: "api-nba-v1.p.rapidapi.com",
+    base: "https://api-nba-v1.p.rapidapi.com",
+    season: "2024-2025",
+    cacheKey: "nba_hub_api_cache_v2",
+    teamCacheKey: "nba_hub_team_logos",
+    ttl: 60 * 60 * 1000,
+    refreshMs: 15 * 60 * 1000,
+  };
+
+  // ---------- Team logo map (populated from API) ----------
+  const teamLogos = {};
+
+  // ---------- Hardcoded fallback dataset ----------
   const PLAYERS = [
     { name: "Shai Gilgeous-Alexander", team: "OKC", teamName: "Thunder", pos: "PG", num: 2, height: "6'6\"", weight: 195, age: 26, exp: 7, college: "Kentucky", ppg: 32.7, rpg: 5.0, apg: 6.2, spg: 2.0, bpg: 1.0, fg: 0.519, tp: 0.358, ft: 0.893, top: 2.3 },
     { name: "Nikola Jokic", team: "DEN", teamName: "Nuggets", pos: "C", num: 15, height: "6'11\"", weight: 284, age: 30, exp: 10, college: "None", ppg: 29.6, rpg: 12.4, apg: 10.2, spg: 1.4, bpg: 0.9, fg: 0.578, tp: 0.413, ft: 0.822, top: 3.0 },
@@ -813,14 +913,273 @@
   const resultsCount = document.getElementById("results-count");
   const modalOverlay = document.getElementById("modal-overlay");
   const modal = document.getElementById("modal");
+  const refreshBtn = document.getElementById("refresh-btn");
+  const lastUpdatedEl = document.getElementById("last-updated");
+  const statusDot = document.getElementById("status-dot");
 
-  let currentList = PLAYERS.slice();
+  // ---------- State ----------
+  let currentData = PLAYERS.slice();
+  let currentSource = "static";
+  let lastUpdated = null;
+  let refreshTimer = null;
+  let isLoading = false;
+
+  // ---------- Cache helpers ----------
+  function saveCache(players, teams) {
+    try {
+      const payload = { players: players, teams: teams || {}, ts: Date.now() };
+      localStorage.setItem(API_CFG.cacheKey, JSON.stringify(payload));
+    } catch (e) {}
+  }
+
+  function loadCache() {
+    try {
+      const raw = localStorage.getItem(API_CFG.cacheKey);
+      if (!raw) return null;
+      const p = JSON.parse(raw);
+      if (Date.now() - p.ts > API_CFG.ttl) return null;
+      return p;
+    } catch (e) { return null; }
+  }
+
+  // ---------- API helpers ----------
+  async function apiFetch(path) {
+    const headers = {
+      "X-RapidAPI-Key": API_CFG.key,
+      "X-RapidAPI-Host": API_CFG.host,
+    };
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const resp = await fetch(API_CFG.base + path, {
+        headers: headers,
+        signal: ctrl.signal,
+      });
+      if (resp.status === 401 || resp.status === 403)
+        throw new Error("API key not authorized — subscribe to API-NBA on RapidAPI");
+      if (resp.status === 429)
+        throw new Error("API rate limit exceeded");
+      if (!resp.ok) throw new Error("API error: HTTP " + resp.status);
+      const data = await resp.json();
+      if (data.errors && data.errors.length > 0) {
+        throw new Error(data.errors[0].message || "API error");
+      }
+      return data.response || [];
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function mapApiPlayer(apiP) {
+    const name = apiP.name || "";
+    const team = (apiP.team && (apiP.team.code || apiP.team.name)) || "";
+    const teamName = (apiP.team && (apiP.team.name || apiP.team.code)) || "";
+    const pos = apiP.position || "";
+    const num = apiP.number || 0;
+    const ht = apiP.height || {};
+    const wt = apiP.weight || {};
+    const htStr = ht.feets ? ht.feets + "'" + (ht.inches || 0) + '"' : "";
+    const wtStr = wt.pounds || "";
+    const born = apiP.born || {};
+    const age = born.date ? calculateAge(born.date) : (apiP.age || 0);
+    const nba = apiP.NBA || {};
+    const exp = nba.pro || 0;
+    const college = apiP.college || (apiP.born && apiP.born.country) || "";
+
+    const stats = apiP.statistics || {};
+    const ppg = stats.points || 0;
+    const rpg = stats.rebounds || 0;
+    const apg = stats.assists || 0;
+    const spg = stats.steals || 0;
+    const bpg = stats.blocks || 0;
+    const topg = stats.turnovers || 0;
+    const fgPct = stats.fg ? (stats.fg.percentage || 0) / 100 : 0;
+    const tpPct = stats.tp ? (stats.tp.percentage || 0) / 100 : 0;
+    const ftPct = stats.ft ? (stats.ft.percentage || 0) / 100 : 0;
+
+    const logo = (apiP.team && apiP.team.logo) || teamLogos[team] || "";
+
+    return {
+      name: name,
+      team: team,
+      teamName: teamName,
+      pos: pos,
+      num: num,
+      height: htStr,
+      weight: wtStr,
+      age: age,
+      exp: exp,
+      college: college,
+      ppg: ppg,
+      rpg: rpg,
+      apg: apg,
+      spg: spg,
+      bpg: bpg,
+      top: topg,
+      fg: fgPct,
+      tp: tpPct,
+      ft: ftPct,
+      logo: logo,
+      fromApi: true,
+    };
+  }
+
+  function calculateAge(dateStr) {
+    if (!dateStr) return 0;
+    const d = new Date(dateStr);
+    const now = new Date();
+    let age = now.getFullYear() - d.getFullYear();
+    const m = now.getMonth() - d.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+    return age;
+  }
+
+  // ---------- Data loading ----------
+  async function loadData() {
+    setLoading(true);
+    setStatus("loading", "Loading data...");
+    grid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div>Fetching latest NBA data...</div>';
+
+    // Load cached team logos first
+    try {
+      const tc = JSON.parse(localStorage.getItem(API_CFG.teamCacheKey) || "{}");
+      Object.assign(teamLogos, tc);
+    } catch (e) {}
+
+    const tasks = [];
+
+    // 1. Fetch team logos only if not already cached
+    if (Object.keys(teamLogos).length === 0) {
+      tasks.push(
+        apiFetch("/teams")
+          .then(function (teams) {
+            const logos = {};
+            teams.forEach(function (t) {
+              if (t.code && t.logo) logos[t.code] = t.logo;
+            });
+            Object.assign(teamLogos, logos);
+            try { localStorage.setItem(API_CFG.teamCacheKey, JSON.stringify(logos)); } catch (e) {}
+          })
+          .catch(function () {})
+      );
+    } else {
+      tasks.push(Promise.resolve());
+    }
+
+    // 2. Fetch players for a curated set of high-profile teams (reduces API calls)
+    const priorityTeams = ["OKC","DEN","MIL","LAL","BOS","MIN","NYK","PHX","GSW","PHI","IND","DAL","MIA","ORL","SAS","MEM","DET","ATL","HOU","TOR"];
+    const teamsToFetch = priorityTeams.filter(function (t) {
+      return PLAYERS.some(function (p) { return p.team === t; });
+    });
+
+    const playerPromises = teamsToFetch.map(function (code) {
+      return apiFetch("/players?team=" + code + "&season=" + API_CFG.season)
+        .catch(function () { return []; });
+    });
+    tasks.push(Promise.all(playerPromises));
+
+    try {
+      const results = await Promise.all(tasks);
+      const allPlayersRaw = results[1] || [];
+      const allApiPlayers = allPlayersRaw.flat();
+
+      if (allApiPlayers.length > 0) {
+        const mapped = allApiPlayers.map(mapApiPlayer).filter(function (p) {
+          return p.name && p.team;
+        });
+        if (mapped.length > 0) {
+          currentData = mergeWithFallback(mapped);
+          currentSource = "live";
+          lastUpdated = new Date();
+          saveCache(currentData, teamLogos);
+          setStatus("live", "Live data · Updated " + fmtTime(lastUpdated));
+          populateTeamFilter();
+          render();
+          renderLeaders();
+          scheduleRefresh();
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("API load failed:", err.message);
+    }
+
+    // ---- Fallback chain ----
+    const cached = loadCache();
+    if (cached && cached.players && cached.players.length > 0) {
+      currentData = cached.players;
+      currentSource = "cache";
+      lastUpdated = new Date(cached.ts);
+      setStatus("cache", "Cached data · " + fmtTime(lastUpdated));
+    } else {
+      currentData = PLAYERS.slice();
+      currentSource = "static";
+      setStatus("static", "Static data · " + fmtTime(new Date()));
+    }
+    populateTeamFilter();
+    render();
+    renderLeaders();
+  }
+
+  function mergeWithFallback(apiPlayers) {
+    const byName = {};
+    PLAYERS.forEach(function (p) { byName[p.name.toLowerCase()] = p; });
+    return apiPlayers.map(function (ap) {
+      const fb = byName[ap.name.toLowerCase()];
+      if (fb) {
+        ap.height = ap.height || fb.height;
+        ap.weight = ap.weight || fb.weight;
+        ap.age = ap.age || fb.age;
+        ap.college = ap.college || fb.college;
+        if (ap.ppg === 0 && fb.ppg) ap.ppg = fb.ppg;
+        if (ap.rpg === 0 && fb.rpg) ap.rpg = fb.rpg;
+        if (ap.apg === 0 && fb.apg) ap.apg = fb.apg;
+        if (ap.spg === 0 && fb.spg) ap.spg = fb.spg;
+        if (ap.bpg === 0 && fb.bpg) ap.bpg = fb.bpg;
+        if (ap.top === 0 && fb.top) ap.top = fb.top;
+      }
+      return ap;
+    });
+  }
+
+  // ---------- UI state ----------
+  function setLoading(loading) {
+    isLoading = loading;
+    refreshBtn.disabled = loading;
+    if (loading) refreshBtn.classList.add("spinning");
+    else refreshBtn.classList.remove("spinning");
+  }
+
+  function setStatus(kind, msg) {
+    statusDot.className = "status-dot dot-" + (kind === "live" ? "live" : kind === "cache" ? "fallback" : kind === "loading" ? "live" : "error");
+    lastUpdatedEl.textContent = msg;
+  }
+
+  function fmtTime(d) {
+    if (!d) return "";
+    const now = new Date();
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return "just now";
+    if (diff < 3600) return Math.floor(diff / 60) + " min ago";
+    if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+    return d.toLocaleTimeString();
+  }
+
+  function scheduleRefresh() {
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(function () {
+      if (document.hidden) return;
+      loadData();
+    }, API_CFG.refreshMs);
+  }
 
   // ---------- Populate team filter ----------
   function populateTeamFilter() {
+    const curVal = teamFilter.value;
+    teamFilter.innerHTML = '<option value="">All Teams</option>';
     const teams = {};
-    PLAYERS.forEach(function (p) {
-      if (!teams[p.team]) teams[p.team] = p.teamName;
+    currentData.forEach(function (p) {
+      if (p.team && !teams[p.team]) teams[p.team] = p.teamName || p.team;
     });
     const sorted = Object.keys(teams).sort(function (a, b) {
       return teams[a].localeCompare(teams[b]);
@@ -831,39 +1190,42 @@
       opt.textContent = teams[abbr] + " (" + abbr + ")";
       teamFilter.appendChild(opt);
     });
+    teamFilter.value = curVal;
   }
 
   // ---------- Stat leaders ----------
   function renderLeaders() {
+    const data = currentData;
+    if (!data.length) return;
     const cats = [
-      { key: "ppg", label: "Points Per Game", suffix: "" },
-      { key: "rpg", label: "Rebounds Per Game", suffix: "" },
-      { key: "apg", label: "Assists Per Game", suffix: "" },
-      { key: "bpg", label: "Blocks Per Game", suffix: "" }
+      { key: "ppg", label: "Points Per Game" },
+      { key: "rpg", label: "Rebounds Per Game" },
+      { key: "apg", label: "Assists Per Game" },
+      { key: "bpg", label: "Blocks Per Game" },
     ];
     leadersRow.innerHTML = "";
     cats.forEach(function (cat) {
-      let best = PLAYERS[0];
-      PLAYERS.forEach(function (p) {
-        if (p[cat.key] > best[cat.key]) best = p;
+      let best = data[0];
+      data.forEach(function (p) {
+        if ((p[cat.key] || 0) > (best[cat.key] || 0)) best = p;
       });
       const card = document.createElement("div");
       card.className = "leader-card";
       card.innerHTML =
         '<div class="label">' + cat.label + "</div>" +
-        '<div class="value">' + best[cat.key].toFixed(1) + "</div>" +
-        '<div class="who">' + best.name + " &middot; " + best.team + "</div>";
+        '<div class="value">' + (best[cat.key] || 0).toFixed(1) + "</div>" +
+        '<div class="who">' + esc(best.name) + " &middot; " + esc(best.team) + "</div>";
       leadersRow.appendChild(card);
     });
   }
 
   // ---------- Helpers ----------
   function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
     });
   }
-  function pct(v) { return (v * 100).toFixed(1) + "%"; }
+  function pct(v) { return ((v || 0) * 100).toFixed(1) + "%"; }
 
   // ---------- Render player cards ----------
   function render() {
@@ -872,46 +1234,58 @@
     const pf = posFilter.value;
     const sb = sortBy.value;
 
-    currentList = PLAYERS.filter(function (p) {
+    let list = (currentData || PLAYERS).filter(function (p) {
       if (tf && p.team !== tf) return false;
       if (pf && p.pos !== pf) return false;
       if (q) {
-        const hay = (p.name + " " + p.team + " " + p.teamName).toLowerCase();
+        const hay = (p.name + " " + (p.team || "") + " " + (p.teamName || "")).toLowerCase();
         if (hay.indexOf(q) === -1) return false;
       }
       return true;
     });
 
-    currentList.sort(function (a, b) {
-      if (sb === "name") return a.name.localeCompare(b.name);
-      return b[sb] - a[sb];
+    list.sort(function (a, b) {
+      if (sb === "name") return (a.name || "").localeCompare(b.name || "");
+      return (b[sb] || 0) - (a[sb] || 0);
     });
 
     grid.innerHTML = "";
-    if (currentList.length === 0) {
+    if (list.length === 0) {
       grid.innerHTML = '<div class="empty-state">No players match your search.</div>';
       resultsCount.textContent = "0 players found";
       return;
     }
 
-    resultsCount.textContent = currentList.length + " player" + (currentList.length === 1 ? "" : "s") + " found";
+    resultsCount.textContent = list.length + " player" + (list.length === 1 ? "" : "s") + " found";
 
-    currentList.forEach(function (p, idx) {
+    const sourceLabel = currentSource === "live"
+      ? '<span class="data-source-badge badge-live">LIVE</span>'
+      : currentSource === "cache"
+      ? '<span class="data-source-badge badge-cache">CACHED</span>'
+      : '<span class="data-source-badge badge-static">STATIC</span>';
+
+    list.forEach(function (p) {
+      const logoHtml = p.logo
+        ? '<img class="pc-logo" src="' + esc(p.logo) + '" alt="" onerror="this.style.display=\'none\'">'
+        : "";
       const card = document.createElement("div");
       card.className = "player-card";
       card.innerHTML =
         '<div class="pc-head">' +
-          '<div>' +
-            '<div class="pc-name">' + esc(p.name) + "</div>" +
-            '<div class="pc-num">#' + p.num + " &middot; " + p.pos + "</div>" +
+          '<div class="pc-left">' +
+            logoHtml +
+            '<div>' +
+              '<div class="pc-name">' + esc(p.name) + sourceLabel + "</div>" +
+              '<div class="pc-num">#' + (p.num || "") + " &middot; " + esc(p.pos || "") + "</div>" +
+            "</div>" +
           "</div>" +
-          '<div class="pc-team">' + esc(p.team) + "</div>" +
+          '<div class="pc-team">' + esc(p.team || "") + "</div>" +
         "</div>" +
-        '<div class="pc-pos">' + esc(p.teamName) + "</div>" +
+        '<div class="pc-pos">' + esc(p.teamName || "") + "</div>" +
         '<div class="pc-stats">' +
-          '<div class="stat"><div class="sv">' + p.ppg.toFixed(1) + '</div><div class="sl">PPG</div></div>' +
-          '<div class="stat"><div class="sv">' + p.rpg.toFixed(1) + '</div><div class="sl">RPG</div></div>' +
-          '<div class="stat"><div class="sv">' + p.apg.toFixed(1) + '</div><div class="sl">APG</div></div>' +
+          '<div class="stat"><div class="sv">' + (p.ppg || 0).toFixed(1) + '</div><div class="sl">PPG</div></div>' +
+          '<div class="stat"><div class="sv">' + (p.rpg || 0).toFixed(1) + '</div><div class="sl">RPG</div></div>' +
+          '<div class="stat"><div class="sv">' + (p.apg || 0).toFixed(1) + '</div><div class="sl">APG</div></div>' +
         "</div>";
       card.addEventListener("click", function () { openModal(p); });
       grid.appendChild(card);
@@ -920,27 +1294,34 @@
 
   // ---------- Modal ----------
   function openModal(p) {
+    const logoHtml = p.logo
+      ? '<img src="' + esc(p.logo) + '" style="width:64px;height:64px;border-radius:50%;object-fit:cover;background:#f0f0f0;" alt="">'
+      : "";
     modal.innerHTML =
       '<div class="modal-head">' +
         '<button class="close-btn" id="modal-close">&times;</button>' +
-        '<div class="mh-name">' + esc(p.name) + "</div>" +
-        '<div class="mh-team">' + p.teamName + " (" + p.team + ") &middot; #" + p.num + " &middot; " + p.pos + "</div>" +
+        '<div style="display:flex;align-items:center;gap:14px;">' + logoHtml +
+        '<div><div class="mh-name">' + esc(p.name) + "</div>" +
+        '<div class="mh-team">' + esc(p.teamName || "") + " (" + esc(p.team || "") + ") &middot; #" + (p.num || "") + " &middot; " + esc(p.pos || "") + "</div>" +
+        '</div></div>' +
       "</div>" +
       '<div class="modal-body">' +
         '<div class="info-row">' +
-          '<div class="info-item"><div class="il">Height</div><div class="iv">' + p.height + " &middot; " + p.weight + " lb</div></div>" +
-          '<div class="info-item"><div class="il">Age</div><div class="iv">' + p.age + " years</div></div>" +
-          '<div class="info-item"><div class="il">Experience</div><div class="iv">' + p.exp + " year" + (p.exp === 1 ? "" : "s") + "</div></div>" +
-          '<div class="info-item"><div class="il">College</div><div class="iv">' + esc(p.college) + "</div></div>" +
+          '<div class="info-item"><div class="il">Height</div><div class="iv">' + esc(p.height || "N/A") + "</div></div>" +
+          '<div class="info-item"><div class="il">Weight</div><div class="iv">' + esc(p.weight ? p.weight + " lb" : "N/A") + "</div></div>" +
+          '<div class="info-item"><div class="il">Age</div><div class="iv">' + (p.age || "N/A") + "</div></div>" +
+          '<div class="info-item"><div class="il">Experience</div><div class="iv">' + (p.exp || 0) + " yr</div></div>" +
+          '<div class="info-item"><div class="il">College</div><div class="iv">' + esc(p.college || "N/A") + "</div></div>" +
+          '<div class="info-item"><div class="il">Source</div><div class="iv">' + (currentSource === "live" ? "Live API" : currentSource === "cache" ? "Cache" : "Static") + "</div></div>" +
         "</div>" +
         '<h4>Per-Game Stats</h4>' +
         '<div class="stat-grid">' +
-          '<div class="stat-box"><div class="sv">' + p.ppg.toFixed(1) + '</div><div class="sl">Points</div></div>' +
-          '<div class="stat-box"><div class="sv">' + p.rpg.toFixed(1) + '</div><div class="sl">Rebounds</div></div>' +
-          '<div class="stat-box"><div class="sv">' + p.apg.toFixed(1) + '</div><div class="sl">Assists</div></div>' +
-          '<div class="stat-box"><div class="sv">' + p.spg.toFixed(1) + '</div><div class="sl">Steals</div></div>' +
-          '<div class="stat-box"><div class="sv">' + p.bpg.toFixed(1) + '</div><div class="sl">Blocks</div></div>' +
-          '<div class="stat-box"><div class="sv">' + p.top.toFixed(1) + '</div><div class="sl">Turnovers</div></div>' +
+          '<div class="stat-box"><div class="sv">' + (p.ppg || 0).toFixed(1) + '</div><div class="sl">Points</div></div>' +
+          '<div class="stat-box"><div class="sv">' + (p.rpg || 0).toFixed(1) + '</div><div class="sl">Rebounds</div></div>' +
+          '<div class="stat-box"><div class="sv">' + (p.apg || 0).toFixed(1) + '</div><div class="sl">Assists</div></div>' +
+          '<div class="stat-box"><div class="sv">' + (p.spg || 0).toFixed(1) + '</div><div class="sl">Steals</div></div>' +
+          '<div class="stat-box"><div class="sv">' + (p.bpg || 0).toFixed(1) + '</div><div class="sl">Blocks</div></div>' +
+          '<div class="stat-box"><div class="sv">' + (p.top || 0).toFixed(1) + '</div><div class="sl">Turnovers</div></div>' +
         "</div>" +
         '<h4 style="margin-top:20px;">Shooting Splits</h4>' +
         '<div class="stat-grid">' +
@@ -969,20 +1350,17 @@
   teamFilter.addEventListener("change", render);
   posFilter.addEventListener("change", render);
   sortBy.addEventListener("change", render);
+  refreshBtn.addEventListener("click", function () {
+    loadData();
+  });
 
   // ---------- Init ----------
-  populateTeamFilter();
-  renderLeaders();
-
-  // Expose render so the auth flow can trigger it on login
   window.renderNBA = function () {
-    render();
-    renderLeaders();
+    loadData();
   };
 
-  // If home is already visible (auto-login ran before this script), render now
   if (!document.getElementById("home-screen").classList.contains("hidden")) {
-    render();
+    loadData();
   }
 })();
 </script>
