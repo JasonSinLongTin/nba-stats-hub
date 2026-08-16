@@ -509,7 +509,58 @@
   .badge-live { background: #e6f4ea; color: #1e8e3e; }
   .badge-cache { background: #fef7e0; color: #f9ab00; }
   .badge-static { background: #e8eaed; color: #5f6368; }
+
+  /* ---------- Auth mode toggle (Firebase) ---------- */
+  .auth-mode-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: #666;
+    background: #f7f9fc;
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .auth-mode-row .am-indicator {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .auth-mode-row .am-cloud { background: #1a73e8; }
+  .auth-mode-row .am-local { background: #999; }
+  .auth-mode-row a {
+    color: #1a73e8;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: auto;
+  }
 </style>
+
+<!-- ============ FIREBASE SDK ============ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   FIREBASE CONFIG — Replace the object below with your own
+   from console.firebase.google.com → Project Settings →
+   Your Apps → SDK setup and configuration → Config
+   ════════════════════════════════════════════════════════════ */
+var firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+try {
+  if (firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+} catch (e) {
+  console.warn("Firebase init failed (config probably not set yet). Using local fallback.", e.message);
+}
+</script>
+
 </head>
 <body>
 
@@ -517,6 +568,12 @@
 <div id="auth-screen">
   <h1 id="auth-title">Log In</h1>
   <p class="subtitle" id="auth-subtitle">Welcome back to NBA Hub</p>
+
+  <div class="auth-mode-row">
+    <span class="am-indicator" id="auth-mode-indicator"></span>
+    <span id="auth-mode-text">—</span>
+    <a id="auth-mode-switch" style="display:none;"></a>
+  </div>
 
   <div id="error-msg" class="error-msg"></div>
   <div id="success-msg" class="success-msg"></div>
@@ -624,28 +681,47 @@
 
   const USERS_KEY = "nba_hub_users";
   const SESSION_KEY = "nba_hub_session";
+  const MODE_KEY = "nba_hub_auth_mode";
 
-  // ---------- Simple hash (not cryptographically secure, but avoids plaintext) ----------
+  // ---------- Simple hash (for local fallback mode only) ----------
   function simpleHash(str) {
     let hash = 5381;
     for (let i = 0; i < str.length; i++) {
       hash = ((hash << 5) + hash) + str.charCodeAt(i);
-      hash = hash & hash; // 32-bit
+      hash = hash & hash;
     }
     return String(hash);
   }
 
   function getUsers() {
-    try {
-      return JSON.parse(localStorage.getItem(USERS_KEY) || "{}");
-    } catch (e) {
-      return {};
-    }
+    try { return JSON.parse(localStorage.getItem(USERS_KEY) || "{}"); }
+    catch (e) { return {}; }
   }
-
   function saveUsers(users) {
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
   }
+
+  // ---------- Detect if Firebase is properly configured ----------
+  function firebaseConfigured() {
+    try {
+      if (!window.firebase || !window.firebase.app || !window.firebase.apps) return false;
+      if (window.firebase.apps.length === 0) return false;
+      var cfg = window.firebase.app().options;
+      if (!cfg.apiKey || cfg.apiKey.indexOf("YOUR_") === 0) return false;
+      if (window.firebase.auth && typeof window.firebase.auth === "function") {
+        try { window.firebase.auth(); return true; } catch (e) { return false; }
+      }
+      return false;
+    } catch (e) { return false; }
+  }
+
+  function getPreferredMode() {
+    var saved = localStorage.getItem(MODE_KEY);
+    if (saved === "cloud" || saved === "local") return saved;
+    return firebaseConfigured() ? "cloud" : "local";
+  }
+
+  var authMode = getPreferredMode();
 
   // ---------- Element refs ----------
   const authScreen = document.getElementById("auth-screen");
@@ -663,19 +739,71 @@
   const regPassword = document.getElementById("reg-password");
   const regConfirm = document.getElementById("reg-confirm");
 
+  const modeIndicator = document.getElementById("auth-mode-indicator");
+  const modeText = document.getElementById("auth-mode-text");
+  const modeSwitch = document.getElementById("auth-mode-switch");
+
+  function updateModeUI() {
+    if (authMode === "cloud") {
+      modeIndicator.className = "am-indicator am-cloud";
+      modeText.textContent = "Cloud auth — accounts sync across all devices & browsers";
+    } else {
+      modeIndicator.className = "am-indicator am-local";
+      modeText.textContent = "Local mode — accounts stored in this browser only";
+    }
+    if (firebaseConfigured()) {
+      modeSwitch.style.display = "inline";
+      modeSwitch.textContent = authMode === "cloud" ? "Switch to local mode" : "Switch to cloud mode";
+    } else {
+      modeSwitch.style.display = "none";
+    }
+  }
+
+  modeSwitch.addEventListener("click", function () {
+    authMode = authMode === "cloud" ? "local" : "cloud";
+    localStorage.setItem(MODE_KEY, authMode);
+    updateModeUI();
+    clearMsgs();
+  });
+
   function clearMsgs() {
     errorMsg.textContent = "";
     successMsg.textContent = "";
   }
+  function showError(msg) { clearMsgs(); errorMsg.textContent = msg; }
+  function showSuccess(msg) { clearMsgs(); successMsg.textContent = msg; }
 
-  function showError(msg) {
-    clearMsgs();
-    errorMsg.textContent = msg;
+  // ---------- Firebase helpers ----------
+  function fakeEmail(username) {
+    return encodeURIComponent(username.toLowerCase()) + "@nba-hub.local";
   }
 
-  function showSuccess(msg) {
-    clearMsgs();
-    successMsg.textContent = msg;
+  function extractDisplayName(userCredential) {
+    try {
+      var user = userCredential.user;
+      if (user.displayName) return user.displayName;
+      var email = user.email || "";
+      var atIdx = email.indexOf("@");
+      if (atIdx > 0) {
+        return decodeURIComponent(email.substring(0, atIdx));
+      }
+      return email || "User";
+    } catch (e) { return "User"; }
+  }
+
+  function firebaseErrorMessage(err) {
+    var code = err.code || "";
+    switch (code) {
+      case "auth/email-already-in-use": return "This username is already taken. Please choose another.";
+      case "auth/weak-password": return "Password must be at least 6 characters.";
+      case "auth/invalid-email": return "Invalid username format.";
+      case "auth/user-not-found": return "Username not found. Please register first.";
+      case "auth/wrong-password": return "Incorrect password.";
+      case "auth/operation-not-allowed": return "Email/password sign-in is not enabled in Firebase console.";
+      case "auth/network-request-failed": return "Network error. Please check your connection.";
+      case "auth/too-many-requests": return "Too many attempts. Please try again later.";
+      default: return err.message || "Authentication error. Please try again.";
+    }
   }
 
   // ---------- View switching ----------
@@ -726,22 +854,50 @@
     if (password.length < 6) { showError("Password must be at least 6 characters."); return; }
     if (password !== confirm) { showError("Passwords do not match."); return; }
 
-    const users = getUsers();
-    if (users[username]) {
-      showError("Username already exists. Please choose another.");
-      return;
+    if (authMode === "cloud") {
+      // -- Firebase cloud auth --
+      if (!firebaseConfigured()) {
+        showError("Firebase not configured yet. Set your firebaseConfig in index.html or switch to local mode.");
+        return;
+      }
+      var regBtn = document.getElementById("register-btn");
+      regBtn.disabled = true;
+      regBtn.textContent = "Creating...";
+      firebase.auth().createUserWithEmailAndPassword(fakeEmail(username), password)
+        .then(function (cred) {
+          return cred.user.updateProfile({ displayName: username }).then(function () { return cred; });
+        })
+        .then(function (cred) {
+          showSuccess("Account created! You can log in now.");
+          loginUsername.value = username;
+          regUsername.value = "";
+          regPassword.value = "";
+          regConfirm.value = "";
+          setTimeout(showLogin, 800);
+        })
+        .catch(function (err) {
+          showError(firebaseErrorMessage(err));
+        })
+        .finally(function () {
+          regBtn.disabled = false;
+          regBtn.textContent = "Register";
+        });
+    } else {
+      // -- Local fallback --
+      const users = getUsers();
+      if (users[username]) {
+        showError("Username already exists. Please choose another.");
+        return;
+      }
+      users[username] = { passwordHash: simpleHash(password) };
+      saveUsers(users);
+      showSuccess("Account created! You can log in now. (local mode)");
+      loginUsername.value = username;
+      regUsername.value = "";
+      regPassword.value = "";
+      regConfirm.value = "";
+      setTimeout(showLogin, 800);
     }
-
-    users[username] = { passwordHash: simpleHash(password) };
-    saveUsers(users);
-    showSuccess("Account created! You can log in now.");
-
-    // Pre-fill login username and switch to login
-    loginUsername.value = username;
-    regUsername.value = "";
-    regPassword.value = "";
-    regConfirm.value = "";
-    setTimeout(showLogin, 800);
   });
 
   // ---------- Login ----------
@@ -753,27 +909,54 @@
     if (!username) { showError("Please enter your username."); return; }
     if (!password) { showError("Please enter your password."); return; }
 
-    const users = getUsers();
-    if (!users[username]) {
-      showError("User not found. Please register first.");
-      return;
+    if (authMode === "cloud") {
+      if (!firebaseConfigured()) {
+        showError("Firebase not configured yet. Set your firebaseConfig in index.html or switch to local mode.");
+        return;
+      }
+      var logBtn = document.getElementById("login-btn");
+      logBtn.disabled = true;
+      logBtn.textContent = "Signing in...";
+      firebase.auth().signInWithEmailAndPassword(fakeEmail(username), password)
+        .then(function (cred) {
+          localStorage.setItem(SESSION_KEY, extractDisplayName(cred));
+          loginUsername.value = "";
+          loginPassword.value = "";
+          showHome(extractDisplayName(cred));
+        })
+        .catch(function (err) {
+          showError(firebaseErrorMessage(err));
+        })
+        .finally(function () {
+          logBtn.disabled = false;
+          logBtn.textContent = "Log In";
+        });
+    } else {
+      // -- Local fallback --
+      const users = getUsers();
+      if (!users[username]) {
+        showError("User not found. Please register first.");
+        return;
+      }
+      if (users[username].passwordHash !== simpleHash(password)) {
+        showError("Incorrect password.");
+        return;
+      }
+      localStorage.setItem(SESSION_KEY, username);
+      loginUsername.value = "";
+      loginPassword.value = "";
+      showHome(username);
     }
-    if (users[username].passwordHash !== simpleHash(password)) {
-      showError("Incorrect password.");
-      return;
-    }
-
-    // Success — set session
-    localStorage.setItem(SESSION_KEY, username);
-    loginUsername.value = "";
-    loginPassword.value = "";
-    showHome(username);
   });
 
   // ---------- Logout ----------
   document.getElementById("logout-btn").addEventListener("click", function () {
     localStorage.removeItem(SESSION_KEY);
-    showAuth();
+    if (authMode === "cloud" && firebaseConfigured()) {
+      firebase.auth().signOut().finally(showAuth);
+    } else {
+      showAuth();
+    }
   });
 
   // ---------- Switch tabs ----------
@@ -788,12 +971,43 @@
     if (e.key === "Enter") document.getElementById("register-btn").click();
   });
 
-  // ---------- Auto-login if session exists ----------
-  const sessionUser = localStorage.getItem(SESSION_KEY);
-  if (sessionUser && getUsers()[sessionUser]) {
-    showHome(sessionUser);
+  // ---------- Session bootstrap ----------
+  function bootstrapWithLocal() {
+    const sessionUser = localStorage.getItem(SESSION_KEY);
+    if (sessionUser && (getUsers()[sessionUser] || true)) {
+      showHome(sessionUser);
+      return true;
+    }
+    return false;
+  }
+
+  updateModeUI();
+
+  if (authMode === "cloud" && firebaseConfigured()) {
+    // Listen for Firebase auth state changes (real session across devices)
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        var name = user.displayName || "User";
+        var email = user.email || "";
+        var atIdx = email.indexOf("@");
+        if (!user.displayName && atIdx > 0) {
+          name = decodeURIComponent(email.substring(0, atIdx));
+        }
+        localStorage.setItem(SESSION_KEY, name);
+        // Don't auto-switch to home if user explicitly chose local mode and is testing
+        if (authMode === "cloud") showHome(name);
+      } else {
+        // Check for legacy local session and stay on home if found
+        if (!bootstrapWithLocal()) {
+          showAuth();
+        }
+      }
+    });
   } else {
-    showAuth();
+    // Pure local mode
+    if (!bootstrapWithLocal()) {
+      showAuth();
+    }
   }
 })();
 </script>
