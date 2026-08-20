@@ -979,6 +979,264 @@
     margin-top: 6px;
     line-height: 1.4;
   }
+
+  /* ---------- Compare trigger button ---------- */
+  .compare-trigger {
+    padding: 12px 18px;
+    background: linear-gradient(135deg, var(--nba-blue), var(--nba-red));
+    color: #fff;
+    border: 1px solid rgba(253,185,39,0.4);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(23,64,139,0.4);
+    position: relative;
+  }
+  .compare-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(201,8,42,0.4);
+  }
+  .compare-count {
+    background: var(--nba-gold);
+    color: #0a0e27;
+    font-size: 11px;
+    font-weight: 900;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+  }
+
+  /* ---------- Compare modal ---------- */
+  .compare-modal { max-width: 760px; }
+  .compare-head {
+    background:
+      radial-gradient(circle at 80% 20%, rgba(253,185,39,0.25), transparent 50%),
+      linear-gradient(135deg, var(--nba-blue) 0%, var(--nba-red) 100%);
+    color: #fff;
+    padding: 22px 28px 18px;
+    border-radius: 16px 16px 0 0;
+    position: relative;
+  }
+  .compare-head h3 {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 4px;
+  }
+  .compare-head .compare-sub {
+    font-size: 13px;
+    opacity: 0.85;
+  }
+  .compare-head .close-btn {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.2s;
+  }
+  .compare-head .close-btn:hover { background: var(--nba-red); transform: rotate(90deg); }
+
+  .compare-selectors {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 14px;
+    align-items: start;
+    padding: 20px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .compare-slot label {
+    display: block;
+    font-size: 10px;
+    color: var(--nba-gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .compare-slot select {
+    width: 100%;
+    padding: 11px 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .compare-slot select option { background: #131a3e; color: #fff; }
+  .compare-slot select:focus {
+    outline: none;
+    border-color: var(--nba-gold);
+    box-shadow: 0 0 0 3px rgba(253,185,39,0.18);
+  }
+  .compare-preview {
+    margin-top: 10px;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .compare-preview.empty {
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    justify-content: center;
+  }
+  .compare-preview img {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+  .compare-preview .cp-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .compare-preview .cp-team {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+  }
+  .compare-vs {
+    align-self: center;
+    font-size: 18px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--nba-gold), var(--nba-orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding: 0 4px;
+  }
+
+  .compare-results { padding: 20px 28px 28px; }
+  .compare-empty {
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    padding: 30px 0;
+    font-size: 14px;
+  }
+
+  .compare-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .compare-side {
+    text-align: right;
+    font-size: 18px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.7);
+    transition: all 0.3s;
+  }
+  .compare-side.side-b { text-align: left; }
+  .compare-side.winner { color: var(--nba-gold); text-shadow: 0 0 12px rgba(253,185,39,0.4); }
+  .compare-cat {
+    text-align: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 700;
+  }
+  .compare-bar-wrap {
+    grid-column: 1 / -1;
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.08);
+    margin-bottom: 16px;
+  }
+  .compare-bar {
+    height: 100%;
+    transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
+  }
+  .compare-bar.bar-a { background: linear-gradient(90deg, var(--nba-blue), #4a8aff); }
+  .compare-bar.bar-b { background: linear-gradient(90deg, #ff6b6b, var(--nba-red)); }
+
+  .compare-summary {
+    margin-top: 24px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(253,185,39,0.2);
+    border-radius: 12px;
+    text-align: center;
+  }
+  .compare-summary .winner-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--nba-gold);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .compare-summary .winner-name {
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .compare-summary .winner-score {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+  }
+  .compare-summary.tie .winner-name { color: var(--nba-gold); }
+
+  /* "Add to compare" button on player cards */
+  .pc-compare-btn {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(253,185,39,0.5);
+    color: var(--nba-gold);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0;
+  }
+  .player-card:hover .pc-compare-btn { opacity: 1; }
+  .pc-compare-btn:hover { background: var(--nba-gold); color: #0a0e27; transform: scale(1.15); }
+  .pc-compare-btn.added { opacity: 1; background: var(--nba-gold); color: #0a0e27; box-shadow: 0 0 12px rgba(253,185,39,0.5); }
+
+  @media (max-width: 600px) {
+    .compare-selectors { grid-template-columns: 1fr; }
+    .compare-vs { padding: 4px 0; }
+    .compare-row { grid-template-columns: 1fr 70px 1fr; }
+    .compare-side { font-size: 16px; }
+  }
 </style>
 
 <!-- ============ FIREBASE SDK ============ -->
@@ -1140,6 +1398,9 @@ try {
           <option value="tp">Sort: 3P %</option>
         </select>
       </div>
+      <button class="compare-trigger" id="compare-trigger-btn">
+        &#9878; Compare Players <span class="compare-count" id="compare-count" style="display:none;">0</span>
+      </button>
     </div>
     <div class="status-bar" id="status-bar">
       <button class="refresh-btn" id="refresh-btn">&#8635; Refresh</button>
@@ -1154,6 +1415,33 @@ try {
 <!-- ============ PLAYER MODAL ============ -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal" id="modal"></div>
+</div>
+
+<!-- ============ COMPARE MODAL ============ -->
+<div class="modal-overlay" id="compare-overlay">
+  <div class="modal compare-modal" id="compare-modal">
+    <div class="compare-head">
+      <button class="close-btn" id="compare-close">&times;</button>
+      <h3>&#9878; Player Comparison</h3>
+      <p class="compare-sub">Pick two players to see who wins in each stat category</p>
+    </div>
+    <div class="compare-selectors">
+      <div class="compare-slot" id="slot-a">
+        <label>Player A</label>
+        <select id="compare-select-a"><option value="">— Select Player A —</option></select>
+        <div class="compare-preview" id="preview-a"></div>
+      </div>
+      <div class="compare-vs">VS</div>
+      <div class="compare-slot" id="slot-b">
+        <label>Player B</label>
+        <select id="compare-select-b"><option value="">— Select Player B —</option></select>
+        <div class="compare-preview" id="preview-b"></div>
+      </div>
+    </div>
+    <div class="compare-results" id="compare-results">
+      <div class="compare-empty">Select two players to begin comparison</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1771,12 +2059,24 @@ try {
   const lastUpdatedEl = document.getElementById("last-updated");
   const statusDot = document.getElementById("status-dot");
 
+  // ---------- Compare refs ----------
+  const compareOverlay = document.getElementById("compare-overlay");
+  const compareModal = document.getElementById("compare-modal");
+  const compareSelectA = document.getElementById("compare-select-a");
+  const compareSelectB = document.getElementById("compare-select-b");
+  const previewA = document.getElementById("preview-a");
+  const previewB = document.getElementById("preview-b");
+  const compareResults = document.getElementById("compare-results");
+  const compareTriggerBtn = document.getElementById("compare-trigger-btn");
+  const compareCountEl = document.getElementById("compare-count");
+
   // ---------- State ----------
   let currentData = PLAYERS.slice();
   let currentSource = "static";
   let lastUpdated = null;
   let refreshTimer = null;
   let isLoading = false;
+  let compareSlots = [null, null]; // [playerNameA, playerNameB]
 
   // ---------- Cache helpers ----------
   function saveCache(players, teams) {
@@ -2124,7 +2424,9 @@ try {
         : "";
       const card = document.createElement("div");
       card.className = "player-card";
+      const inCompare = compareSlots.indexOf(p.name) !== -1;
       card.innerHTML =
+        '<button class="pc-compare-btn' + (inCompare ? " added" : "") + '" title="' + (inCompare ? "Remove from compare" : "Add to compare") + '">' + (inCompare ? "&#10003;" : "+") + "</button>" +
         '<div class="pc-head">' +
           '<div class="pc-left">' +
             logoHtml +
@@ -2142,6 +2444,13 @@ try {
           '<div class="stat"><div class="sv">' + (p.apg || 0).toFixed(1) + '</div><div class="sl">APG</div></div>' +
         "</div>";
       card.addEventListener("click", function () { openModal(p); });
+      var cmpBtn = card.querySelector(".pc-compare-btn");
+      if (cmpBtn) {
+        cmpBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          toggleCompareSlot(p.name);
+        });
+      }
       grid.appendChild(card);
     });
   }
@@ -2195,8 +2504,168 @@ try {
     if (e.target === modalOverlay) closeModal();
   });
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeModal();
+    if (e.key === "Escape") { closeModal(); closeCompare(); }
   });
+
+  // ---------- Compare logic ----------
+  function findPlayerByName(name) {
+    if (!name) return null;
+    return (currentData || PLAYERS).find(function (p) { return p.name === name; }) || null;
+  }
+
+  function populateCompareSelects() {
+    const sorted = (currentData || PLAYERS).slice().sort(function (a, b) {
+      return (a.name || "").localeCompare(b.name || "");
+    });
+    const optsHtml = '<option value="">— Select Player —</option>' +
+      sorted.map(function (p) {
+        return '<option value="' + esc(p.name) + '">' + esc(p.name) + " (" + esc(p.team || "") + ")</option>";
+      }).join("");
+    compareSelectA.innerHTML = optsHtml;
+    compareSelectB.innerHTML = optsHtml;
+    compareSelectA.value = compareSlots[0] || "";
+    compareSelectB.value = compareSlots[1] || "";
+  }
+
+  function renderComparePreview(slotEl, name) {
+    const p = findPlayerByName(name);
+    if (!p) {
+      slotEl.className = "compare-preview empty";
+      slotEl.innerHTML = "No player selected";
+      return;
+    }
+    const logoHtml = p.logo
+      ? '<img src="' + esc(p.logo) + '" alt="">'
+      : "";
+    slotEl.className = "compare-preview";
+    slotEl.innerHTML = logoHtml +
+      '<div><div class="cp-name">' + esc(p.name) + "</div>" +
+      '<div class="cp-team">' + esc(p.teamName || p.team || "") + " &middot; " + esc(p.pos || "") + "</div></div>";
+  }
+
+  function updateCompareCount() {
+    const count = compareSlots.filter(function (s) { return s; }).length;
+    if (count > 0) {
+      compareCountEl.style.display = "inline-flex";
+      compareCountEl.textContent = count;
+    } else {
+      compareCountEl.style.display = "none";
+    }
+  }
+
+  function toggleCompareSlot(name) {
+    // If already in a slot, remove it
+    if (compareSlots[0] === name) { compareSlots[0] = null; }
+    else if (compareSlots[1] === name) { compareSlots[1] = null; }
+    else {
+      // Add to first empty slot, or replace slot B if both full
+      if (!compareSlots[0]) compareSlots[0] = name;
+      else if (!compareSlots[1]) compareSlots[1] = name;
+      else compareSlots[1] = name;
+    }
+    updateCompareCount();
+    render();
+  }
+
+  function openCompare() {
+    populateCompareSelects();
+    renderComparePreview(previewA, compareSelectA.value);
+    renderComparePreview(previewB, compareSelectB.value);
+    renderComparison();
+    compareOverlay.classList.add("show");
+  }
+
+  function closeCompare() {
+    compareOverlay.classList.remove("show");
+  }
+
+  function renderComparison() {
+    const nameA = compareSelectA.value;
+    const nameB = compareSelectB.value;
+    renderComparePreview(previewA, nameA);
+    renderComparePreview(previewB, nameB);
+
+    if (!nameA || !nameB) {
+      compareResults.innerHTML = '<div class="compare-empty">Select two players to begin comparison</div>';
+      return;
+    }
+    if (nameA === nameB) {
+      compareResults.innerHTML = '<div class="compare-empty">Select two different players to compare</div>';
+      return;
+    }
+
+    const pA = findPlayerByName(nameA);
+    const pB = findPlayerByName(nameB);
+    if (!pA || !pB) {
+      compareResults.innerHTML = '<div class="compare-empty">Could not find one or both players</div>';
+      return;
+    }
+
+    const cats = [
+      { key: "ppg", label: "Points", max: 40 },
+      { key: "rpg", label: "Rebounds", max: 15 },
+      { key: "apg", label: "Assists", max: 15 },
+      { key: "spg", label: "Steals", max: 3 },
+      { key: "bpg", label: "Blocks", max: 4 },
+      { key: "fg", label: "FG %", max: 1, isPct: true },
+      { key: "tp", label: "3P %", max: 1, isPct: true },
+      { key: "ft", label: "FT %", max: 1, isPct: true },
+    ];
+
+    let scoreA = 0, scoreB = 0;
+    let rowsHtml = "";
+
+    cats.forEach(function (cat) {
+      const vA = pA[cat.key] || 0;
+      const vB = pB[cat.key] || 0;
+      const dispA = cat.isPct ? pct(vA) : vA.toFixed(1);
+      const dispB = cat.isPct ? pct(vB) : vB.toFixed(1);
+      let winnerA = false, winnerB = false;
+      if (vA > vB) { winnerA = true; scoreA++; }
+      else if (vB > vA) { winnerB = true; scoreB++; }
+
+      // Bar widths (relative to max and each other)
+      const maxVal = Math.max(vA, vB, cat.max * 0.1);
+      const pctA = Math.min(100, (vA / cat.max) * 100);
+      const pctB = Math.min(100, (vB / cat.max) * 100);
+
+      rowsHtml +=
+        '<div class="compare-row">' +
+          '<div class="compare-side' + (winnerA ? " winner" : "") + '">' + dispA + "</div>" +
+          '<div class="compare-cat">' + cat.label + "</div>" +
+          '<div class="compare-side side-b' + (winnerB ? " winner" : "") + '">' + dispB + "</div>" +
+          '<div class="compare-bar-wrap">' +
+            '<div class="compare-bar bar-a" style="width:' + pctA + '%"></div>' +
+            '<div class="compare-bar bar-b" style="width:' + pctB + '%"></div>' +
+          "</div>" +
+        "</div>";
+    });
+
+    let summaryHtml;
+    if (scoreA > scoreB) {
+      summaryHtml = '<div class="compare-summary"><div class="winner-label">Overall Winner</div>' +
+        '<div class="winner-name">' + esc(pA.name) + "</div>" +
+        '<div class="winner-score">Wins ' + scoreA + " of " + cats.length + " categories</div></div>";
+    } else if (scoreB > scoreA) {
+      summaryHtml = '<div class="compare-summary"><div class="winner-label">Overall Winner</div>' +
+        '<div class="winner-name">' + esc(pB.name) + "</div>" +
+        '<div class="winner-score">Wins ' + scoreB + " of " + cats.length + " categories</div></div>";
+    } else {
+      summaryHtml = '<div class="compare-summary tie"><div class="winner-label">Result</div>' +
+        '<div class="winner-name">It\'s a tie!</div>' +
+        '<div class="winner-score">' + scoreA + " - " + scoreB + "</div></div>";
+    }
+
+    compareResults.innerHTML = rowsHtml + summaryHtml;
+  }
+
+  compareTriggerBtn.addEventListener("click", openCompare);
+  document.getElementById("compare-close").addEventListener("click", closeCompare);
+  compareOverlay.addEventListener("click", function (e) {
+    if (e.target === compareOverlay) closeCompare();
+  });
+  compareSelectA.addEventListener("change", renderComparison);
+  compareSelectB.addEventListener("change", renderComparison);
 
   // ---------- Wire up controls ----------
   searchInput.addEventListener("input", render);
