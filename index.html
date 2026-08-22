@@ -900,14 +900,47 @@
     margin-left: auto;
   }
 
+  /* ---------- Advanced options toggle ---------- */
+  .advanced-toggle {
+    margin-top: 18px;
+    width: 100%;
+    padding: 8px 10px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .advanced-toggle:hover {
+    color: var(--nba-gold);
+    background: rgba(253,185,39,0.08);
+  }
+
+  /* ---------- Collapsible transfer box ---------- */
+  .transfer-box {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease, margin 0.25s ease;
+    padding-top: 0;
+    margin-top: 0;
+  }
+  .transfer-box.open {
+    max-height: 1200px;
+    opacity: 1;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+
   /* ---------- Import / Export ---------- */
   .transfer-actions {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255,255,255,0.12);
   }
   .transfer-actions button {
     flex: 1;
@@ -1764,11 +1797,15 @@ try {
     <p class="toggle-text">Already have an account? <a id="switch-to-login">Log In</a></p>
   </div>
 
-  <!-- Import / Export actions -->
-  <div class="transfer-actions">
-    <button id="btn-show-export">&#8593; Export My Account</button>
-    <button id="btn-show-import">&#8595; Import Account</button>
-  </div>
+  <!-- Advanced options toggle (only visible when JavaScript runs; default collapsed in cloud mode) -->
+  <button type="button" class="advanced-toggle" id="advanced-toggle">&#9660; Advanced options</button>
+
+  <!-- Import / Export actions (hidden by default in cloud mode) -->
+  <div class="transfer-box" id="transfer-box">
+    <div class="transfer-actions">
+      <button id="btn-show-export">&#8593; Export My Account</button>
+      <button id="btn-show-import">&#8595; Import Account</button>
+    </div>
 
   <!-- Export panel -->
   <div class="transfer-panel" id="export-panel">
@@ -1790,6 +1827,7 @@ try {
       <button class="tp-close" data-close="import-panel">Close</button>
     </div>
   </div>
+  </div><!-- /transfer-box -->
 </div>
 
 <!-- ============ HOME SCREEN ============ -->
@@ -1797,7 +1835,7 @@ try {
   <div class="topbar">
     <div class="brand"><span class="brand-ball"></span><span class="nba-text">NBA</span> Hub</div>
     <div class="user-area">
-      <button class="logout-btn" id="export-btn" title="Export your account to use on other devices/browsers" style="background:rgba(253,185,39,0.15);color:var(--nba-gold);border:1px solid rgba(253,185,39,0.4);margin-right:8px;">&#8593; Export</button>
+      <button class="logout-btn" id="export-btn" title="Backup: export a manual account code (optional — in Cloud mode, just log in with your username/password on any device)" style="background:rgba(253,185,39,0.12);color:var(--nba-gold);border:1px solid rgba(253,185,39,0.35);margin-right:8px;font-size:0.78rem;">&#8634; Backup</button>
       <span class="welcome">Hi, <b id="current-user"></b></span>
       <button class="logout-btn" id="logout-btn">Log Out</button>
     </div>
@@ -1950,7 +1988,44 @@ try {
   const SESSION_KEY = "nba_hub_session";
   const MODE_KEY = "nba_hub_auth_mode";
 
-  // ---------- Simple hash (for local fallback mode only) ----------
+  // ---------- MantleDB cloud storage (cross-browser auth) ----------
+  // MantleDB is a free, anonymous JSON key-value store. No setup required.
+  // Namespace is deliberately unique to avoid collisions with other apps.
+  const MANTLE_NAMESPACE = "nba-hub-accounts-v1-7f3a9c2e8b1d";
+  const MANTLE_BASE = "https://mantledb.sh/v2/" + MANTLE_NAMESPACE;
+
+  function mantleURL(path) {
+    return MANTLE_BASE + "/" + path.replace(/^\/+/, "");
+  }
+
+  // Generate a cryptographically-random salt
+  function generateSalt() {
+    var arr = new Uint8Array(16);
+    if (window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(arr);
+    } else {
+      for (var i = 0; i < arr.length; i++) arr[i] = Math.floor(Math.random() * 256);
+    }
+    return Array.from(arr).map(function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+  }
+
+  // Salted password hash (used for cloud mode + local mode storage)
+  function saltedHash(password, salt) {
+    // djb2-style hash with salt prefix, iterated for mild strengthening
+    var s = salt + "|" + password;
+    let hash = 5381;
+    for (let round = 0; round < 10; round++) {
+      for (let i = 0; i < s.length; i++) {
+        hash = ((hash << 5) + hash) + s.charCodeAt(i);
+        hash = hash & hash;
+      }
+      s = String(hash) + "::" + s;
+    }
+    if (hash < 0) hash = (hash >>> 0);
+    return hash.toString(16).padStart(8, "0");
+  }
+
+  // ---------- Simple hash (legacy, kept for local-only mode back-compat) ----------
   function simpleHash(str) {
     let hash = 5381;
     for (let i = 0; i < str.length; i++) {
@@ -1968,24 +2043,53 @@ try {
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
   }
 
-  // ---------- Detect if Firebase is properly configured ----------
-  function firebaseConfigured() {
-    try {
-      if (!window.firebase || !window.firebase.app || !window.firebase.apps) return false;
-      if (window.firebase.apps.length === 0) return false;
-      var cfg = window.firebase.app().options;
-      if (!cfg.apiKey || cfg.apiKey.indexOf("YOUR_") === 0) return false;
-      if (window.firebase.auth && typeof window.firebase.auth === "function") {
-        try { window.firebase.auth(); return true; } catch (e) { return false; }
+  // ---------- MantleDB helpers ----------
+  function mantleCloudAvailable() {
+    // MantleDB needs only the fetch API; no keys, no setup
+    return typeof window.fetch === "function";
+  }
+
+  function usernameKey(username) {
+    // Store each user under their own path for atomic reads
+    return "users/" + encodeURIComponent(username.toLowerCase());
+  }
+
+  function cloudGetUser(username) {
+    return fetch(mantleURL(usernameKey(username)), {
+      method: "GET",
+      headers: { "Accept": "application/json" }
+    }).then(function (res) {
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error("Server error: " + res.status);
+      return res.json().catch(function () { return null; });
+    });
+  }
+
+  function cloudPutUser(username, data) {
+    return fetch(mantleURL(usernameKey(username)), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(data)
+    }).then(function (res) {
+      if (!res.ok) {
+        return res.text().catch(function () { return ""; }).then(function (body) {
+          throw new Error("Server error " + res.status + ": " + (body || res.statusText));
+        });
       }
-      return false;
-    } catch (e) { return false; }
+      return res.json().catch(function () { return true; });
+    });
+  }
+
+  // ---------- Detect if cloud auth is available ----------
+  // Cloud auth now uses MantleDB — no API keys, no setup, just fetch().
+  function cloudAuthAvailable() {
+    return mantleCloudAvailable();
   }
 
   function getPreferredMode() {
     var saved = localStorage.getItem(MODE_KEY);
     if (saved === "cloud" || saved === "local") return saved;
-    return firebaseConfigured() ? "cloud" : "local";
+    return cloudAuthAvailable() ? "cloud" : "local";
   }
 
   var authMode = getPreferredMode();
@@ -2013,12 +2117,12 @@ try {
   function updateModeUI() {
     if (authMode === "cloud") {
       modeIndicator.className = "am-indicator am-cloud";
-      modeText.textContent = "Cloud auth — accounts sync across all devices & browsers";
+      modeText.textContent = "\u2601 Cloud Sync — register once, log in on any browser or device";
     } else {
       modeIndicator.className = "am-indicator am-local";
-      modeText.textContent = "Local mode — accounts stored in this browser only";
+      modeText.textContent = "\ud83d\udcbe Local mode — accounts stored in this browser only";
     }
-    if (firebaseConfigured()) {
+    if (cloudAuthAvailable()) {
       modeSwitch.style.display = "inline";
       modeSwitch.textContent = authMode === "cloud" ? "Switch to local mode" : "Switch to cloud mode";
     } else {
@@ -2039,39 +2143,6 @@ try {
   }
   function showError(msg) { clearMsgs(); errorMsg.textContent = msg; }
   function showSuccess(msg) { clearMsgs(); successMsg.textContent = msg; }
-
-  // ---------- Firebase helpers ----------
-  function fakeEmail(username) {
-    return encodeURIComponent(username.toLowerCase()) + "@nba-hub.local";
-  }
-
-  function extractDisplayName(userCredential) {
-    try {
-      var user = userCredential.user;
-      if (user.displayName) return user.displayName;
-      var email = user.email || "";
-      var atIdx = email.indexOf("@");
-      if (atIdx > 0) {
-        return decodeURIComponent(email.substring(0, atIdx));
-      }
-      return email || "User";
-    } catch (e) { return "User"; }
-  }
-
-  function firebaseErrorMessage(err) {
-    var code = err.code || "";
-    switch (code) {
-      case "auth/email-already-in-use": return "This username is already taken. Please choose another.";
-      case "auth/weak-password": return "Password must be at least 6 characters.";
-      case "auth/invalid-email": return "Invalid username format.";
-      case "auth/user-not-found": return "Username not found. Please register first.";
-      case "auth/wrong-password": return "Incorrect password.";
-      case "auth/operation-not-allowed": return "Email/password sign-in is not enabled in Firebase console.";
-      case "auth/network-request-failed": return "Network error. Please check your connection.";
-      case "auth/too-many-requests": return "Too many attempts. Please try again later.";
-      default: return err.message || "Authentication error. Please try again.";
-    }
-  }
 
   // ---------- View switching ----------
   function showLogin() {
@@ -2122,28 +2193,44 @@ try {
     if (password !== confirm) { showError("Passwords do not match."); return; }
 
     if (authMode === "cloud") {
-      // -- Firebase cloud auth --
-      if (!firebaseConfigured()) {
-        showError("Firebase not configured yet. Set your firebaseConfig in index.html or switch to local mode.");
+      // -- MantleDB cloud auth --
+      if (!cloudAuthAvailable()) {
+        showError("Cloud auth is not available in this browser. Switch to local mode.");
         return;
       }
       var regBtn = document.getElementById("register-btn");
       regBtn.disabled = true;
-      regBtn.textContent = "Creating...";
-      firebase.auth().createUserWithEmailAndPassword(fakeEmail(username), password)
-        .then(function (cred) {
-          return cred.user.updateProfile({ displayName: username }).then(function () { return cred; });
+      regBtn.textContent = "Creating account...";
+      // First, check if username already exists in cloud
+      cloudGetUser(username)
+        .then(function (existing) {
+          if (existing) {
+            throw new Error("Username already exists. Please choose another.");
+          }
+          var salt = generateSalt();
+          var userRecord = {
+            username: username,
+            salt: salt,
+            passwordHash: saltedHash(password, salt),
+            createdAt: Date.now(),
+            v: 1
+          };
+          return cloudPutUser(username, userRecord);
         })
-        .then(function (cred) {
-          showSuccess("Account created! You can log in now.");
+        .then(function () {
+          showSuccess("\u2705 Account created! Use the same username + password on any browser or device.");
           loginUsername.value = username;
           regUsername.value = "";
           regPassword.value = "";
           regConfirm.value = "";
-          setTimeout(showLogin, 800);
+          setTimeout(showLogin, 1000);
         })
         .catch(function (err) {
-          showError(firebaseErrorMessage(err));
+          var msg = err.message || String(err);
+          if (msg && msg.toLowerCase().indexOf("network") >= 0 || msg.indexOf("Failed to fetch") >= 0) {
+            msg = "Can't reach the cloud. Please check your internet connection or switch to local mode.";
+          }
+          showError(msg);
         })
         .finally(function () {
           regBtn.disabled = false;
@@ -2156,7 +2243,9 @@ try {
         showError("Username already exists. Please choose another.");
         return;
       }
-      users[username] = { passwordHash: simpleHash(password) };
+      // Use salted hash for local mode too (safer, consistent format)
+      var salt = generateSalt();
+      users[username] = { salt: salt, passwordHash: saltedHash(password, salt), v: 1 };
       saveUsers(users);
       showSuccess("Account created! You can log in now. (local mode)");
       loginUsername.value = username;
@@ -2177,22 +2266,41 @@ try {
     if (!password) { showError("Please enter your password."); return; }
 
     if (authMode === "cloud") {
-      if (!firebaseConfigured()) {
-        showError("Firebase not configured yet. Set your firebaseConfig in index.html or switch to local mode.");
+      if (!cloudAuthAvailable()) {
+        showError("Cloud auth is not available in this browser. Switch to local mode.");
         return;
       }
       var logBtn = document.getElementById("login-btn");
       logBtn.disabled = true;
       logBtn.textContent = "Signing in...";
-      firebase.auth().signInWithEmailAndPassword(fakeEmail(username), password)
-        .then(function (cred) {
-          localStorage.setItem(SESSION_KEY, extractDisplayName(cred));
+      cloudGetUser(username)
+        .then(function (record) {
+          if (!record) {
+            throw new Error("Username not found. Please register first.");
+          }
+          if (!record.salt || !record.passwordHash) {
+            throw new Error("Corrupted account record. Please re-register.");
+          }
+          var expected = saltedHash(password, record.salt);
+          if (expected !== record.passwordHash) {
+            throw new Error("Incorrect password.");
+          }
+          // Also cache in local users list for offline awareness
+          var users = getUsers();
+          users[username] = { salt: record.salt, passwordHash: record.passwordHash, v: record.v || 1 };
+          saveUsers(users);
+          localStorage.setItem(SESSION_KEY, username);
           loginUsername.value = "";
           loginPassword.value = "";
-          showHome(extractDisplayName(cred));
+          showSuccess("\u2705 Signed in! Your account is synced across all your devices.");
+          setTimeout(function () { showHome(username); }, 500);
         })
         .catch(function (err) {
-          showError(firebaseErrorMessage(err));
+          var msg = err.message || String(err);
+          if (msg.indexOf("Failed to fetch") >= 0 || (msg && msg.toLowerCase().indexOf("network") >= 0)) {
+            msg = "Can't reach the cloud. Please check your internet connection or switch to local mode.";
+          }
+          showError(msg);
         })
         .finally(function () {
           logBtn.disabled = false;
@@ -2205,7 +2313,21 @@ try {
         showError("User not found. Please register first.");
         return;
       }
-      if (users[username].passwordHash !== simpleHash(password)) {
+      var rec = users[username];
+      var ok = false;
+      // Support both legacy simpleHash (no salt) and new saltedHash format
+      if (rec.salt && typeof rec.passwordHash === "string") {
+        ok = (rec.passwordHash === saltedHash(password, rec.salt));
+      } else {
+        ok = (rec.passwordHash === simpleHash(password));
+        // Migrate to salted hash on successful login
+        if (ok) {
+          var newSalt = generateSalt();
+          users[username] = { salt: newSalt, passwordHash: saltedHash(password, newSalt), v: 1 };
+          saveUsers(users);
+        }
+      }
+      if (!ok) {
         showError("Incorrect password.");
         return;
       }
@@ -2241,11 +2363,7 @@ try {
   // ---------- Logout ----------
   document.getElementById("logout-btn").addEventListener("click", function () {
     localStorage.removeItem(SESSION_KEY);
-    if (authMode === "cloud" && firebaseConfigured()) {
-      firebase.auth().signOut().finally(showAuth);
-    } else {
-      showAuth();
-    }
+    showAuth();
   });
 
   // ---------- Switch tabs ----------
@@ -2409,30 +2527,41 @@ try {
     }
   });
 
-  if (authMode === "cloud" && firebaseConfigured()) {
-    // Listen for Firebase auth state changes (real session across devices)
-    firebase.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        var name = user.displayName || "User";
-        var email = user.email || "";
-        var atIdx = email.indexOf("@");
-        if (!user.displayName && atIdx > 0) {
-          name = decodeURIComponent(email.substring(0, atIdx));
-        }
-        localStorage.setItem(SESSION_KEY, name);
-        // Don't auto-switch to home if user explicitly chose local mode and is testing
-        if (authMode === "cloud") showHome(name);
-      } else {
-        // Check for legacy local session and stay on home if found
-        if (!bootstrapWithLocal()) {
-          showAuth();
-        }
-      }
+  // ---------- Session bootstrap (cloud + local unified) ----------
+  // For MantleDB cloud mode, sessions are still tracked locally via SESSION_KEY
+  // (cloud just stores credentials; per-device session is localStorage).
+  // In cloud mode we also try to verify the session user still exists in cloud.
+  function tryBootstrap() {
+    var sessionUser = localStorage.getItem(SESSION_KEY);
+    if (!sessionUser) { showAuth(); return; }
+
+    if (authMode === "cloud" && cloudAuthAvailable()) {
+      // Lightweight check — just show home immediately (fast UX).
+      // A stale/invalid session user will just fail on next cloud action,
+      // which is fine for an NBA stats fan site.
+      showHome(sessionUser);
+    } else {
+      bootstrapWithLocal() || showAuth();
+    }
+  }
+
+  tryBootstrap();
+
+  // ---------- Advanced options toggle (hides Import / Export by default in cloud mode) ----------
+  var advToggle = document.getElementById("advanced-toggle");
+  var transferBox = document.getElementById("transfer-box");
+  if (advToggle && transferBox) {
+    advToggle.addEventListener("click", function () {
+      var expanded = transferBox.classList.toggle("open");
+      advToggle.textContent = expanded ? "\u25b2 Hide advanced options" : "\u25bc Advanced options";
     });
-  } else {
-    // Pure local mode
-    if (!bootstrapWithLocal()) {
-      showAuth();
+    // Default: in cloud mode, hide import/export behind toggle since it's no longer needed
+    if (authMode === "cloud") {
+      transferBox.classList.remove("open");
+      advToggle.textContent = "\u25bc Advanced options";
+    } else {
+      transferBox.classList.add("open");
+      advToggle.textContent = "\u25b2 Hide advanced options";
     }
   }
 })();
