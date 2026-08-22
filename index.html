@@ -1207,35 +1207,236 @@
   }
   .compare-summary.tie .winner-name { color: var(--nba-gold); }
 
-  /* "Add to compare" button on player cards */
+  /* ---------- NEW: Comparison Queue panel (visible list) ---------- */
+  .compare-queue {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: stretch;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(253,185,39,0.18), transparent 40%),
+      radial-gradient(circle at 80% 50%, rgba(201,8,42,0.2), transparent 40%),
+      rgba(255,255,255,0.04);
+    border: 2px solid rgba(253,185,39,0.35);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  .queue-slot {
+    background: rgba(10,14,39,0.55);
+    border: 1px dashed rgba(253,185,39,0.3);
+    border-radius: 12px;
+    padding: 14px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .queue-slot.filled {
+    background: linear-gradient(180deg, rgba(23,64,139,0.3), rgba(10,14,39,0.6));
+    border: 1px solid rgba(253,185,39,0.45);
+    border-style: solid;
+  }
+  .queue-slot.slot-b.filled {
+    background: linear-gradient(180deg, rgba(201,8,42,0.25), rgba(10,14,39,0.6));
+    border-color: rgba(201,8,42,0.55);
+  }
+  .queue-slot .qs-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--nba-gold);
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .queue-slot.slot-b .qs-label { color: #ff8888; }
+  .queue-slot .qs-empty {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+  }
+  .queue-slot .qs-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  .queue-slot .qs-card img {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+  .queue-slot .qs-info { text-align: left; flex: 1; min-width: 0; }
+  .queue-slot .qs-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .queue-slot .qs-team {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+  }
+  .queue-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(201,8,42,0.8);
+    border: none;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 900;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .queue-remove:hover { background: var(--nba-red); transform: scale(1.2); }
+  .queue-vs {
+    align-self: center;
+    font-size: 14px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--nba-gold), var(--nba-orange));
+    color: #0a0e27;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(253,185,39,0.5);
+  }
+  .queue-start-wrap {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .queue-start-btn {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--nba-gold), var(--nba-orange));
+    color: #0a0e27;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(253,185,39,0.45);
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .queue-start-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(253,185,39,0.65);
+  }
+  .queue-start-btn:disabled {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.3);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .queue-hint {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    margin-top: -4px;
+  }
+
+  /* ---------- Updated: make compare trigger BIGGER ---------- */
+  .compare-trigger {
+    padding: 14px 22px;
+    background: linear-gradient(135deg, var(--nba-blue), var(--nba-red));
+    color: #fff;
+    border: 2px solid rgba(253,185,39,0.55);
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 6px 20px rgba(23,64,139,0.5), 0 0 0 0 rgba(253,185,39,0.0);
+    animation: pulseBtn 3s ease-in-out infinite;
+  }
+  @keyframes pulseBtn {
+    0%, 100% { box-shadow: 0 6px 20px rgba(23,64,139,0.5), 0 0 0 0 rgba(253,185,39,0.0); }
+    50% { box-shadow: 0 6px 20px rgba(23,64,139,0.5), 0 0 0 6px rgba(253,185,39,0.15); }
+  }
+  .compare-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(201,8,42,0.5);
+  }
+
+  /* ---------- Updated: ALWAYS-VISIBLE Add buttons on cards ---------- */
   .pc-compare-btn {
     position: absolute;
-    bottom: 14px;
-    right: 14px;
+    bottom: 12px;
+    right: 12px;
     z-index: 2;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(253,185,39,0.5);
+    width: 38px;
+    height: 22px;
+    border-radius: 11px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(253,185,39,0.55);
     color: var(--nba-gold);
-    font-size: 16px;
+    font-size: 11px;
+    font-weight: 800;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    opacity: 0;
+    opacity: 1; /* Always visible now */
+    padding: 0 2px;
   }
   .player-card:hover .pc-compare-btn { opacity: 1; }
-  .pc-compare-btn:hover { background: var(--nba-gold); color: #0a0e27; transform: scale(1.15); }
-  .pc-compare-btn.added { opacity: 1; background: var(--nba-gold); color: #0a0e27; box-shadow: 0 0 12px rgba(253,185,39,0.5); }
+  .pc-compare-btn:hover {
+    background: var(--nba-gold);
+    color: #0a0e27;
+    transform: scale(1.1);
+    width: auto;
+    padding: 0 8px;
+  }
+  .pc-compare-btn:hover::after {
+    content: " Compare";
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .pc-compare-btn.added {
+    opacity: 1;
+    background: var(--nba-gold);
+    color: #0a0e27;
+    box-shadow: 0 0 12px rgba(253,185,39,0.5);
+    border-color: var(--nba-gold);
+    width: auto;
+    padding: 0 6px;
+  }
 
   @media (max-width: 600px) {
     .compare-selectors { grid-template-columns: 1fr; }
     .compare-vs { padding: 4px 0; }
     .compare-row { grid-template-columns: 1fr 70px 1fr; }
     .compare-side { font-size: 16px; }
+    .compare-queue { grid-template-columns: 1fr; }
+    .queue-vs { justify-self: center; }
   }
 </style>
 
@@ -1949,7 +2150,7 @@ try {
     key: "b4065c301emshb93047d0b159c1fp160ffejsnda0d82e06d03",
     host: "api-nba-v1.p.rapidapi.com",
     base: "https://api-nba-v1.p.rapidapi.com",
-    season: "2024-2025",
+    season: "2025-2026",
     cacheKey: "nba_hub_api_cache_v2",
     teamCacheKey: "nba_hub_team_logos",
     ttl: 60 * 60 * 1000,
@@ -2042,7 +2243,64 @@ try {
     { name: "Dillon Brooks", team: "HOU", teamName: "Rockets", pos: "SF", num: 9, height: "6'6\"", weight: 225, age: 28, exp: 8, college: "Oregon", ppg: 14.0, rpg: 3.7, apg: 1.7, spg: 0.8, bpg: 0.3, fg: 0.428, tp: 0.359, ft: 0.840, top: 1.4 },
     { name: "Devin Vassell", team: "SAS", teamName: "Spurs", pos: "SG", num: 24, height: "6'5\"", weight: 200, age: 24, exp: 5, college: "Florida State", ppg: 17.8, rpg: 4.0, apg: 3.5, spg: 1.2, bpg: 0.5, fg: 0.453, tp: 0.372, ft: 0.800, top: 1.7 },
     { name: "Chris Paul", team: "SAS", teamName: "Spurs", pos: "PG", num: 3, height: "6'0\"", weight: 175, age: 40, exp: 20, college: "Wake Forest", ppg: 9.2, rpg: 3.7, apg: 7.4, spg: 1.2, bpg: 0.1, fg: 0.457, tp: 0.376, ft: 0.930, top: 1.5 },
-    { name: "Andrew Nembhard", team: "IND", teamName: "Pacers", pos: "PG", num: 2, height: "6'5\"", weight: 193, age: 25, exp: 3, college: "Gonzaga", ppg: 10.0, rpg: 3.0, apg: 5.5, spg: 1.1, bpg: 0.2, fg: 0.464, tp: 0.349, ft: 0.769, top: 1.4 }
+    { name: "Andrew Nembhard", team: "IND", teamName: "Pacers", pos: "PG", num: 2, height: "6'5\"", weight: 193, age: 25, exp: 3, college: "Gonzaga", ppg: 10.0, rpg: 3.0, apg: 5.5, spg: 1.1, bpg: 0.2, fg: 0.464, tp: 0.349, ft: 0.769, top: 1.4 },
+    { name: "Kawhi Leonard", team: "LAC", teamName: "Clippers", pos: "SF", num: 2, height: "6'7\"", weight: 225, age: 34, exp: 14, college: "San Diego State", ppg: 21.5, rpg: 5.9, apg: 3.1, spg: 1.6, bpg: 0.5, fg: 0.525, tp: 0.413, ft: 0.885, top: 1.9 },
+    { name: "James Harden", team: "LAC", teamName: "Clippers", pos: "PG", num: 1, height: "6'5\"", weight: 220, age: 36, exp: 16, college: "Arizona State", ppg: 16.6, rpg: 5.2, apg: 8.5, spg: 1.1, bpg: 0.8, fg: 0.428, tp: 0.381, ft: 0.875, top: 3.2 },
+    { name: "Norman Powell", team: "LAC", teamName: "Clippers", pos: "SG", num: 24, height: "6'3\"", weight: 215, age: 32, exp: 10, college: "UCLA", ppg: 21.8, rpg: 3.2, apg: 2.1, spg: 1.2, bpg: 0.3, fg: 0.485, tp: 0.418, ft: 0.831, top: 1.5 },
+    { name: "Ivica Zubac", team: "LAC", teamName: "Clippers", pos: "C", num: 40, height: "7'0\"", weight: 240, age: 28, exp: 9, college: "None", ppg: 12.0, rpg: 9.2, apg: 1.7, spg: 0.4, bpg: 1.1, fg: 0.612, tp: 0.000, ft: 0.798, top: 1.6 },
+    { name: "Derrick Jones Jr.", team: "LAC", teamName: "Clippers", pos: "SF", num: 5, height: "6'6\"", weight: 210, age: 28, exp: 7, college: "None", ppg: 10.0, rpg: 3.4, apg: 1.1, spg: 0.7, bpg: 0.6, fg: 0.500, tp: 0.333, ft: 0.729, top: 0.9 },
+    { name: "Cooper Flagg", team: "DAL", teamName: "Mavericks", pos: "PF", num: 2, height: "6'9\"", weight: 205, age: 19, exp: 0, college: "Duke", ppg: 19.5, rpg: 7.5, apg: 3.5, spg: 1.5, bpg: 1.0, fg: 0.482, tp: 0.365, ft: 0.810, top: 2.8 },
+    { name: "Jared McCain", team: "PHI", teamName: "76ers", pos: "SG", num: 20, height: "6'2\"", weight: 192, age: 21, exp: 1, college: "Duke", ppg: 15.3, rpg: 2.4, apg: 2.6, spg: 0.7, bpg: 0.1, fg: 0.458, tp: 0.405, ft: 0.856, top: 1.4 },
+    { name: "Stephon Castle", team: "SAS", teamName: "Spurs", pos: "SG", num: 5, height: "6'6\"", weight: 215, age: 21, exp: 1, college: "UConn", ppg: 14.7, rpg: 3.7, apg: 4.2, spg: 1.0, bpg: 0.4, fg: 0.429, tp: 0.285, ft: 0.755, top: 2.3 },
+    { name: "Zaccharie Risacher", team: "ATL", teamName: "Hawks", pos: "SF", num: 0, height: "6'9\"", weight: 195, age: 20, exp: 1, college: "None", ppg: 12.6, rpg: 3.6, apg: 1.2, spg: 0.7, bpg: 0.5, fg: 0.454, tp: 0.353, ft: 0.742, top: 1.2 },
+    { name: "Alex Sarr", team: "WAS", teamName: "Wizards", pos: "C", num: 20, height: "7'0\"", weight: 216, age: 20, exp: 1, college: "None", ppg: 13.0, rpg: 6.5, apg: 2.4, spg: 0.8, bpg: 2.2, fg: 0.451, tp: 0.312, ft: 0.705, top: 2.1 },
+    { name: "Jalen Duren", team: "DET", teamName: "Pistons", pos: "C", num: 0, height: "6'10\"", weight: 250, age: 21, exp: 3, college: "Memphis", ppg: 11.6, rpg: 10.8, apg: 2.5, spg: 0.8, bpg: 1.5, fg: 0.603, tp: 0.000, ft: 0.615, top: 1.5 },
+    { name: "Jaden Ivey", team: "DET", teamName: "Pistons", pos: "SG", num: 23, height: "6'4\"", weight: 195, age: 23, exp: 3, college: "Purdue", ppg: 17.6, rpg: 4.1, apg: 4.0, spg: 1.0, bpg: 0.4, fg: 0.460, tp: 0.408, ft: 0.740, top: 2.0 },
+    { name: "Ausar Thompson", team: "DET", teamName: "Pistons", pos: "SF", num: 9, height: "6'6\"", weight: 218, age: 22, exp: 2, college: "None", ppg: 10.1, rpg: 5.7, apg: 2.4, spg: 1.3, bpg: 0.9, fg: 0.484, tp: 0.250, ft: 0.685, top: 1.4 },
+    { name: "Paolo Banchero", team: "ORL", teamName: "Magic", pos: "PF", num: 5, height: "6'10\"", weight: 250, age: 22, exp: 3, college: "Duke", ppg: 25.0, rpg: 7.4, apg: 5.0, spg: 0.9, bpg: 0.7, fg: 0.453, tp: 0.339, ft: 0.725, top: 3.3 },
+    { name: "Jalen Suggs", team: "ORL", teamName: "Magic", pos: "PG", num: 4, height: "6'5\"", weight: 205, age: 23, exp: 4, college: "Gonzaga", ppg: 14.7, rpg: 3.4, apg: 3.8, spg: 1.5, bpg: 0.6, fg: 0.455, tp: 0.382, ft: 0.781, top: 1.6 },
+    { name: "Wendell Carter Jr.", team: "ORL", teamName: "Magic", pos: "C", num: 34, height: "6'10\"", weight: 270, age: 26, exp: 7, college: "Duke", ppg: 8.7, rpg: 6.8, apg: 1.8, spg: 0.6, bpg: 0.7, fg: 0.523, tp: 0.286, ft: 0.733, top: 1.1 },
+    { name: "Bennedict Mathurin", team: "IND", teamName: "Pacers", pos: "SG", num: 00, height: "6'6\"", weight: 210, age: 23, exp: 3, college: "Arizona", ppg: 17.1, rpg: 4.0, apg: 2.1, spg: 0.8, bpg: 0.3, fg: 0.471, tp: 0.374, ft: 0.821, top: 1.6 },
+    { name: "Trey Haliburton", team: "IND", teamName: "Pacers", pos: "PG", num: 0, height: "6'5\"", weight: 185, age: 24, exp: 5, college: "Iowa State", ppg: 20.5, rpg: 3.7, apg: 10.5, spg: 1.5, bpg: 0.7, fg: 0.472, tp: 0.386, ft: 0.853, top: 2.4 },
+    { name: "Jabari Smith Jr.", team: "HOU", teamName: "Rockets", pos: "PF", num: 10, height: "6'11\"", weight: 220, age: 22, exp: 3, college: "Auburn", ppg: 13.7, rpg: 8.1, apg: 1.4, spg: 0.7, bpg: 0.9, fg: 0.453, tp: 0.363, ft: 0.805, top: 1.3 },
+    { name: "Amen Thompson", team: "HOU", teamName: "Rockets", pos: "SF", num: 1, height: "6'7\"", weight: 218, age: 22, exp: 2, college: "None", ppg: 14.1, rpg: 8.2, apg: 3.8, spg: 1.4, bpg: 1.3, fg: 0.554, tp: 0.275, ft: 0.671, top: 1.8 },
+    { name: "Tari Eason", team: "HOU", teamName: "Rockets", pos: "PF", num: 17, height: "6'8\"", weight: 215, age: 24, exp: 3, college: "LSU", ppg: 11.2, rpg: 6.4, apg: 1.1, spg: 1.4, bpg: 0.9, fg: 0.487, tp: 0.346, ft: 0.743, top: 1.2 },
+    { name: "Jaime Jaquez Jr.", team: "MIA", teamName: "Heat", pos: "SF", num: 11, height: "6'6\"", weight: 225, age: 24, exp: 2, college: "UCLA", ppg: 16.2, rpg: 4.5, apg: 3.0, spg: 1.0, bpg: 0.4, fg: 0.489, tp: 0.312, ft: 0.812, top: 1.9 },
+    { name: "Kel'el Ware", team: "MIA", teamName: "Heat", pos: "C", num: 7, height: "7'0\"", weight: 230, age: 21, exp: 1, college: "Indiana", ppg: 9.3, rpg: 5.6, apg: 0.8, spg: 0.5, bpg: 1.1, fg: 0.548, tp: 0.368, ft: 0.693, top: 1.1 },
+    { name: "Naz Reid", team: "MIN", teamName: "Timberwolves", pos: "C", num: 11, height: "6'9\"", weight: 264, age: 25, exp: 6, college: "LSU", ppg: 14.2, rpg: 6.0, apg: 1.2, spg: 0.7, bpg: 0.8, fg: 0.480, tp: 0.413, ft: 0.782, top: 1.3 },
+    { name: "Jaden McDaniels", team: "MIN", teamName: "Timberwolves", pos: "PF", num: 3, height: "6'9\"", weight: 200, age: 24, exp: 5, college: "Washington", ppg: 12.2, rpg: 4.7, apg: 1.7, spg: 1.3, bpg: 0.8, fg: 0.483, tp: 0.337, ft: 0.789, top: 1.3 },
+    { name: "Donte DiVincenzo", team: "MIN", teamName: "Timberwolves", pos: "SG", num: 0, height: "6'4\"", weight: 200, age: 28, exp: 7, college: "Villanova", ppg: 15.5, rpg: 3.7, apg: 3.7, spg: 1.3, bpg: 0.4, fg: 0.443, tp: 0.400, ft: 0.845, top: 1.7 },
+    { name: "Jimmy Butler", team: "MIA", teamName: "Heat", pos: "SF", num: 22, height: "6'7\"", weight: 230, age: 35, exp: 14, college: "Marquette", ppg: 17.0, rpg: 5.3, apg: 5.2, spg: 1.6, bpg: 0.5, fg: 0.498, tp: 0.355, ft: 0.852, top: 1.9 },
+    { name: "Pascal Siakam", team: "IND", teamName: "Pacers", pos: "PF", num: 43, height: "6'8\"", weight: 230, age: 30, exp: 9, college: "New Mexico State", ppg: 20.2, rpg: 6.9, apg: 3.4, spg: 0.9, bpg: 0.6, fg: 0.519, tp: 0.386, ft: 0.772, top: 2.1 },
+    { name: "Trey Murphy III", team: "NOP", teamName: "Pelicans", pos: "SF", num: 25, height: "6'8\"", weight: 206, age: 24, exp: 4, college: "Virginia", ppg: 19.3, rpg: 4.6, apg: 2.3, spg: 1.0, bpg: 0.5, fg: 0.448, tp: 0.396, ft: 0.856, top: 1.6 },
+    { name: "Herbert Jones", team: "NOP", teamName: "Pelicans", pos: "SF", num: 5, height: "6'8\"", weight: 210, age: 26, exp: 4, college: "Alabama", ppg: 10.8, rpg: 3.4, apg: 2.6, spg: 1.6, bpg: 0.8, fg: 0.468, tp: 0.325, ft: 0.783, top: 1.2 },
+    { name: "Jalen Johnson", team: "ATL", teamName: "Hawks", pos: "PF", num: 1, height: "6'9\"", weight: 219, age: 23, exp: 4, college: "Duke", ppg: 18.8, rpg: 10.0, apg: 5.0, spg: 1.2, bpg: 0.9, fg: 0.505, tp: 0.293, ft: 0.731, top: 2.4 },
+    { name: "Dyson Daniels", team: "ATL", teamName: "Hawks", pos: "PG", num: 5, height: "6'7\"", weight: 199, age: 22, exp: 3, college: "None", ppg: 11.2, rpg: 5.0, apg: 4.0, spg: 1.8, bpg: 0.6, fg: 0.474, tp: 0.352, ft: 0.718, top: 1.6 },
+    { name: "Onyeka Okongwu", team: "ATL", teamName: "Hawks", pos: "C", num: 17, height: "6'8\"", weight: 235, age: 24, exp: 4, college: "USC", ppg: 11.3, rpg: 6.9, apg: 1.5, spg: 0.8, bpg: 0.9, fg: 0.545, tp: 0.348, ft: 0.740, top: 1.2 },
+    { name: "Dennis Schroder", team: "SAC", teamName: "Kings", pos: "PG", num: 17, height: "6'1\"", weight: 172, age: 32, exp: 12, college: "None", ppg: 13.6, rpg: 2.7, apg: 5.5, spg: 1.0, bpg: 0.2, fg: 0.451, tp: 0.376, ft: 0.841, top: 1.9 },
+    { name: "Keegan Murray", team: "SAC", teamName: "Kings", pos: "PF", num: 13, height: "6'8\"", weight: 215, age: 24, exp: 3, college: "Iowa", ppg: 12.5, rpg: 4.7, apg: 1.3, spg: 0.7, bpg: 0.5, fg: 0.460, tp: 0.385, ft: 0.780, top: 1.0 },
+    { name: "Malik Monk", team: "SAC", teamName: "Kings", pos: "SG", num: 0, height: "6'3\"", weight: 190, age: 27, exp: 8, college: "Kentucky", ppg: 17.2, rpg: 3.6, apg: 5.0, spg: 0.8, bpg: 0.3, fg: 0.446, tp: 0.371, ft: 0.850, top: 2.1 },
+    { name: "Keon Ellis", team: "SAC", teamName: "Kings", pos: "SG", num: 23, height: "6'6\"", weight: 190, age: 25, exp: 3, college: "Alabama", ppg: 8.2, rpg: 2.8, apg: 1.8, spg: 1.2, bpg: 0.4, fg: 0.481, tp: 0.395, ft: 0.765, top: 0.8 },
+    { name: "Scoot Henderson", team: "POR", teamName: "Trail Blazers", pos: "PG", num: 00, height: "6'3\"", weight: 195, age: 21, exp: 2, college: "None", ppg: 12.4, rpg: 3.1, apg: 5.0, spg: 1.0, bpg: 0.3, fg: 0.418, tp: 0.325, ft: 0.771, top: 2.4 },
+    { name: "Deni Avdija", team: "POR", teamName: "Trail Blazers", pos: "SF", num: 8, height: "6'9\"", weight: 215, age: 24, exp: 5, college: "None", ppg: 14.8, rpg: 7.2, apg: 3.6, spg: 0.9, bpg: 0.5, fg: 0.470, tp: 0.353, ft: 0.762, top: 1.9 },
+    { name: "Toumani Camara", team: "POR", teamName: "Trail Blazers", pos: "PF", num: 00, height: "6'7\"", weight: 220, age: 25, exp: 2, college: "Dayton", ppg: 10.5, rpg: 5.4, apg: 1.7, spg: 1.1, bpg: 0.7, fg: 0.481, tp: 0.342, ft: 0.718, top: 1.1 },
+    { name: "Keyonte George", team: "UTA", teamName: "Jazz", pos: "PG", num: 3, height: "6'4\"", weight: 200, age: 21, exp: 2, college: "Baylor", ppg: 16.3, rpg: 3.5, apg: 5.4, spg: 0.9, bpg: 0.2, fg: 0.406, tp: 0.361, ft: 0.847, top: 2.5 },
+    { name: "Taylor Hendricks", team: "UTA", teamName: "Jazz", pos: "PF", num: 9, height: "6'9\"", weight: 200, age: 21, exp: 2, college: "UCF", ppg: 7.5, rpg: 4.5, apg: 0.9, spg: 0.6, bpg: 0.8, fg: 0.453, tp: 0.312, ft: 0.745, top: 1.0 },
+    { name: "John Collins", team: "UTA", teamName: "Jazz", pos: "PF", num: 20, height: "6'9\"", weight: 231, age: 27, exp: 8, college: "Wake Forest", ppg: 15.2, rpg: 6.5, apg: 1.5, spg: 0.8, bpg: 0.8, fg: 0.530, tp: 0.338, ft: 0.741, top: 1.4 },
+    { name: "Bilal Coulibaly", team: "WAS", teamName: "Wizards", pos: "SF", num: 0, height: "6'6\"", weight: 210, age: 20, exp: 2, college: "None", ppg: 12.5, rpg: 4.3, apg: 3.4, spg: 1.3, bpg: 0.7, fg: 0.470, tp: 0.341, ft: 0.762, top: 1.7 },
+    { name: "Bub Carrington", team: "WAS", teamName: "Wizards", pos: "PG", num: 8, height: "6'4\"", weight: 195, age: 19, exp: 1, college: "Pittsburgh", ppg: 9.8, rpg: 4.0, apg: 4.4, spg: 0.8, bpg: 0.3, fg: 0.432, tp: 0.328, ft: 0.773, top: 1.9 },
+    { name: "Miles Bridges", team: "CHA", teamName: "Hornets", pos: "PF", num: 0, height: "6'7\"", weight: 225, age: 27, exp: 6, college: "Michigan State", ppg: 19.0, rpg: 7.0, apg: 3.0, spg: 0.8, bpg: 0.5, fg: 0.450, tp: 0.348, ft: 0.825, top: 2.2 },
+    { name: "Mark Williams", team: "CHA", teamName: "Hornets", pos: "C", num: 5, height: "7'0\"", weight: 242, age: 23, exp: 3, college: "Duke", ppg: 11.2, rpg: 9.7, apg: 1.0, spg: 0.7, bpg: 1.4, fg: 0.621, tp: 0.000, ft: 0.648, top: 1.3 },
+    { name: "Josh Giddey", team: "CHI", teamName: "Bulls", pos: "PG", num: 2, height: "6'8\"", weight: 205, age: 22, exp: 4, college: "None", ppg: 14.6, rpg: 8.1, apg: 7.2, spg: 1.0, bpg: 0.6, fg: 0.465, tp: 0.353, ft: 0.705, top: 2.5 },
+    { name: "Matas Buzelis", team: "CHI", teamName: "Bulls", pos: "PF", num: 14, height: "6'10\"", weight: 208, age: 20, exp: 1, college: "None", ppg: 8.6, rpg: 3.9, apg: 0.8, spg: 0.6, bpg: 0.8, fg: 0.448, tp: 0.352, ft: 0.788, top: 1.0 },
+    { name: "Patrick Williams", team: "CHI", teamName: "Bulls", pos: "PF", num: 44, height: "6'7\"", weight: 225, age: 23, exp: 5, college: "Florida State", ppg: 9.0, rpg: 3.5, apg: 1.5, spg: 0.7, bpg: 0.5, fg: 0.460, tp: 0.355, ft: 0.786, top: 0.9 },
+    { name: "Evan Mobley", team: "CLE", teamName: "Cavaliers", pos: "C", num: 4, height: "6'11\"", weight: 215, age: 23, exp: 4, college: "USC", ppg: 18.5, rpg: 9.3, apg: 3.2, spg: 0.9, bpg: 1.4, fg: 0.556, tp: 0.370, ft: 0.714, top: 1.9 },
+    { name: "Jarrett Allen", team: "CLE", teamName: "Cavaliers", pos: "C", num: 31, height: "6'11\"", weight: 243, age: 27, exp: 8, college: "Texas", ppg: 13.5, rpg: 9.4, apg: 2.7, spg: 0.7, bpg: 0.9, fg: 0.612, tp: 0.000, ft: 0.733, top: 1.5 },
+    { name: "Max Strus", team: "CLE", teamName: "Cavaliers", pos: "SG", num: 1, height: "6'5\"", weight: 215, age: 29, exp: 6, college: "DePaul", ppg: 12.2, rpg: 4.5, apg: 4.0, spg: 0.8, bpg: 0.4, fg: 0.440, tp: 0.371, ft: 0.818, top: 1.3 },
+    { name: "De'Andre Hunter", team: "CLE", teamName: "Cavaliers", pos: "SF", num: 12, height: "6'8\"", weight: 223, age: 27, exp: 6, college: "Virginia", ppg: 14.5, rpg: 3.9, apg: 1.2, spg: 0.7, bpg: 0.4, fg: 0.470, tp: 0.385, ft: 0.845, top: 1.0 },
+    { name: "Cam Johnson", team: "BKN", teamName: "Nets", pos: "SF", num: 2, height: "6'8\"", weight: 210, age: 29, exp: 6, college: "Virginia", ppg: 16.5, rpg: 4.5, apg: 2.5, spg: 0.8, bpg: 0.4, fg: 0.458, tp: 0.390, ft: 0.855, top: 1.3 },
+    { name: "Noah Clowney", team: "BKN", teamName: "Nets", pos: "PF", num: 21, height: "6'10\"", weight: 210, age: 20, exp: 2, college: "Alabama", ppg: 9.1, rpg: 5.3, apg: 1.2, spg: 0.7, bpg: 0.7, fg: 0.421, tp: 0.335, ft: 0.745, top: 1.2 },
+    { name: "D'Angelo Russell", team: "BKN", teamName: "Nets", pos: "PG", num: 1, height: "6'4\"", weight: 195, age: 29, exp: 10, college: "Ohio State", ppg: 14.0, rpg: 3.0, apg: 5.5, spg: 0.8, bpg: 0.3, fg: 0.421, tp: 0.358, ft: 0.842, top: 2.0 }
   ];
 
   // ---------- Element refs ----------
@@ -2221,7 +2479,7 @@ try {
     }
 
     // 2. Fetch players for a curated set of high-profile teams (reduces API calls)
-    const priorityTeams = ["OKC","DEN","MIL","LAL","BOS","MIN","NYK","PHX","GSW","PHI","IND","DAL","MIA","ORL","SAS","MEM","DET","ATL","HOU","TOR"];
+    const priorityTeams = ["ATL","BOS","BKN","CHA","CHI","CLE","DAL","DEN","DET","GSW","HOU","IND","LAC","LAL","MEM","MIA","MIL","MIN","NOP","NYK","OKC","ORL","PHI","PHX","POR","SAC","SAS","TOR","UTA","WAS"];
     const teamsToFetch = priorityTeams.filter(function (t) {
       return PLAYERS.some(function (p) { return p.team === t; });
     });
