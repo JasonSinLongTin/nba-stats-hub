@@ -1438,6 +1438,253 @@
     .compare-queue { grid-template-columns: 1fr; }
     .queue-vs { justify-self: center; }
   }
+
+  /* ---------- NEW: Stat range filter ---------- */
+  .stat-range-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(10,14,39,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 8px 12px;
+  }
+  .stat-range-wrap label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--nba-gold);
+    white-space: nowrap;
+  }
+  .stat-range-wrap select, .stat-range-wrap input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .stat-range-wrap .clear-range {
+    background: rgba(201,8,42,0.7);
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    cursor: pointer;
+    font-weight: 900;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stat-range-wrap .clear-range:hover { background: var(--nba-red); }
+
+  /* ---------- NEW: Standings / Power Rankings section ---------- */
+  .standings-section {
+    margin-bottom: 32px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .section-head h2 { margin: 0; }
+  .standings-tabs {
+    display: flex;
+    gap: 6px;
+    background: rgba(10,14,39,0.6);
+    border-radius: 10px;
+    padding: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .standings-tab {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .standings-tab.active {
+    background: linear-gradient(135deg, var(--nba-blue), var(--nba-red));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(23,64,139,0.4);
+  }
+  .standings-tab:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.06); }
+  .standings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .standings-table th {
+    text-align: left;
+    padding: 10px 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--nba-gold);
+    border-bottom: 2px solid rgba(253,185,39,0.3);
+    font-weight: 800;
+  }
+  .standings-table th.num, .standings-table td.num { text-align: right; }
+  .standings-table td {
+    padding: 9px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .standings-table tr:hover td { background: rgba(255,255,255,0.04); }
+  .standings-table .rank {
+    font-weight: 900;
+    color: var(--nba-gold);
+    width: 36px;
+  }
+  .standings-table .team-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+  }
+  .standings-table .team-cell img {
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    object-fit: contain;
+  }
+  .standings-table .conf-tag {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .conf-east { background: rgba(23,64,139,0.4); color: #6fa8ff; }
+  .conf-west { background: rgba(201,8,42,0.3); color: #ff8888; }
+  .standings-note {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ---------- NEW: League leaderboard ---------- */
+  .leaderboard-list { display: flex; flex-direction: column; gap: 6px; }
+  .lb-row {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(10,14,39,0.5);
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+  }
+  .lb-row.top1 { border-left-color: var(--nba-gold); background: rgba(253,185,39,0.1); }
+  .lb-row.top2 { border-left-color: #c0c0c0; }
+  .lb-row.top3 { border-left-color: #cd7f32; }
+  .lb-rank { font-weight: 900; color: var(--nba-gold); font-size: 13px; }
+  .lb-name { font-weight: 700; font-size: 14px; }
+  .lb-name small { color: rgba(255,255,255,0.5); font-weight: 500; margin-left: 6px; }
+  .lb-val { font-weight: 900; font-size: 16px; color: var(--nba-gold); }
+
+  /* ---------- NEW: Enhanced player modal (radar + similar) ---------- */
+  .modal { max-width: 720px; }
+  .radar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 8px 0 4px;
+  }
+  .radar-svg { width: 280px; height: 280px; }
+  .radar-axis-label {
+    font-size: 10px;
+    fill: rgba(255,255,255,0.65);
+    font-weight: 700;
+  }
+  .radar-shape {
+    fill: rgba(253,185,39,0.25);
+    stroke: var(--nba-gold);
+    stroke-width: 2;
+  }
+  .radar-dot { fill: var(--nba-gold); }
+  .similar-section { margin-top: 18px; }
+  .similar-section h4 { margin: 0 0 10px; }
+  .similar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .similar-card {
+    background: rgba(10,14,39,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .similar-card:hover {
+    border-color: var(--nba-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(253,185,39,0.25);
+  }
+  .similar-card .sc-name { font-weight: 800; font-size: 13px; }
+  .similar-card .sc-team { font-size: 11px; color: rgba(255,255,255,0.55); margin: 2px 0 6px; }
+  .similar-card .sc-match {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--nba-gold);
+    background: rgba(253,185,39,0.12);
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+  .player-strengths {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 8px 0 4px;
+  }
+  .strength-tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 800;
+    background: rgba(109,212,126,0.15);
+    color: #6dd47e;
+    border: 1px solid rgba(109,212,126,0.3);
+  }
+  .strength-tag.weak {
+    background: rgba(201,8,42,0.15);
+    color: #ff8888;
+    border-color: rgba(201,8,42,0.3);
+  }
+  .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .modal-act-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid rgba(253,185,39,0.4);
+    background: rgba(253,185,39,0.1);
+    color: var(--nba-gold);
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .modal-act-btn:hover { background: rgba(253,185,39,0.25); transform: translateY(-1px); }
+  .modal-act-btn.primary {
+    background: linear-gradient(135deg, var(--nba-blue), var(--nba-red));
+    color: #fff;
+    border: none;
+  }
 </style>
 
 <!-- ============ FIREBASE SDK ============ -->
@@ -1565,6 +1812,21 @@ try {
     <h2>Stat Leaders</h2>
     <div class="leaders-row" id="leaders-row"></div>
 
+    <!-- Standings / Power Rankings -->
+    <div class="standings-section">
+      <div class="section-head">
+        <h2>Team Power Rankings</h2>
+        <div class="standings-tabs">
+          <button class="standings-tab active" data-standings-tab="all">All</button>
+          <button class="standings-tab" data-standings-tab="east">East</button>
+          <button class="standings-tab" data-standings-tab="west">West</button>
+          <button class="standings-tab" data-standings-tab="leaders">League Leaders</button>
+        </div>
+      </div>
+      <div id="standings-body"></div>
+      <p class="standings-note">Rankings derived from aggregate team scoring and efficiency of rostered players. Stats update with live data.</p>
+    </div>
+
     <!-- Players section -->
     <h2>NBA Players</h2>
     <div class="controls">
@@ -1599,6 +1861,23 @@ try {
           <option value="tp">Sort: 3P %</option>
         </select>
       </div>
+      <div class="stat-range-wrap" title="Filter players by minimum stat value">
+        <label>Min</label>
+        <select id="stat-range-field">
+          <option value="">Stat</option>
+          <option value="ppg">PPG</option>
+          <option value="rpg">RPG</option>
+          <option value="apg">APG</option>
+          <option value="spg">SPG</option>
+          <option value="bpg">BPG</option>
+          <option value="fg">FG%</option>
+          <option value="tp">3P%</option>
+          <option value="ft">FT%</option>
+          <option value="age">Age</option>
+        </select>
+        <input type="number" id="stat-range-min" placeholder="0" min="0" step="0.1" style="width:64px;">
+        <button class="clear-range" id="clear-range-btn" title="Clear stat filter">&times;</button>
+      </div>
       <button class="compare-trigger" id="compare-trigger-btn">
         &#9878; Compare Players <span class="compare-count" id="compare-count" style="display:none;">0</span>
       </button>
@@ -1609,6 +1888,24 @@ try {
       <span class="last-updated" id="last-updated">Loading...</span>
     </div>
     <div class="results-count" id="results-count"></div>
+
+    <!-- Visible Comparison Queue -->
+    <div class="compare-queue" id="compare-queue">
+      <div class="queue-slot slot-a" id="queue-slot-a">
+        <div class="qs-label">Player A</div>
+        <div class="qs-empty">Click + on a player card</div>
+      </div>
+      <div class="queue-vs">VS</div>
+      <div class="queue-slot slot-b" id="queue-slot-b">
+        <div class="qs-label">Player B</div>
+        <div class="qs-empty">Click + on a player card</div>
+      </div>
+      <div class="queue-hint">Add 2 players using the &nbsp;<b>+</b>&nbsp; button on any card, then compare side-by-side.</div>
+      <div class="queue-start-wrap">
+        <button class="queue-start-btn" id="queue-start-btn" disabled>&#9951; Compare Now</button>
+      </div>
+    </div>
+
     <div class="player-grid" id="player-grid"></div>
   </div>
 </div>
@@ -2328,6 +2625,24 @@ try {
   const compareTriggerBtn = document.getElementById("compare-trigger-btn");
   const compareCountEl = document.getElementById("compare-count");
 
+  // New feature element refs
+  const standingsBody = document.getElementById("standings-body");
+  const queueSlotA = document.getElementById("queue-slot-a");
+  const queueSlotB = document.getElementById("queue-slot-b");
+  const queueStartBtn = document.getElementById("queue-start-btn");
+  const statRangeField = document.getElementById("stat-range-field");
+  const statRangeMin = document.getElementById("stat-range-min");
+  const clearRangeBtn = document.getElementById("clear-range-btn");
+  let standingsTab = "all";
+
+  // NBA conference map (for standings grouping)
+  const CONFERENCE = {
+    ATL:"east",BOS:"east",BKN:"east",CHA:"east",CHI:"east",CLE:"east",DET:"east",IND:"east",
+    MIA:"east",MIL:"east",NYK:"east",ORL:"east",PHI:"east",TOR:"east",WAS:"east",
+    DAL:"west",DEN:"west",GSW:"west",HOU:"west",LAC:"west",LAL:"west",MEM:"west",MIN:"west",
+    NOP:"west",OKC:"west",PHX:"west",POR:"west",SAC:"west",SAS:"west",UTA:"west"
+  };
+
   // ---------- State ----------
   let currentData = PLAYERS.slice();
   let currentSource = "static";
@@ -2508,6 +2823,8 @@ try {
           populateTeamFilter();
           render();
           renderLeaders();
+          renderStandings();
+          renderCompareQueue();
           scheduleRefresh();
           return;
         }
@@ -2531,6 +2848,8 @@ try {
     populateTeamFilter();
     render();
     renderLeaders();
+    renderStandings();
+    renderCompareQueue();
   }
 
   function mergeWithFallback(apiPlayers) {
@@ -2639,16 +2958,266 @@ try {
   }
   function pct(v) { return ((v || 0) * 100).toFixed(1) + "%"; }
 
+  // ---------- Standings / Power Rankings ----------
+  function buildTeamAggregates() {
+    const map = {};
+    (currentData || PLAYERS).forEach(function (p) {
+      const code = p.team;
+      if (!code) return;
+      if (!map[code]) {
+        map[code] = { code: code, teamName: p.teamName || code, logo: p.logo || teamLogos[code] || "",
+                     players: 0, ppgSum: 0, rpgSum: 0, apgSum: 0, fgSum: 0, tpSum: 0, topPlayer: p };
+      }
+      const t = map[code];
+      t.players++;
+      t.ppgSum += (p.ppg || 0);
+      t.rpgSum += (p.rpg || 0);
+      t.apgSum += (p.apg || 0);
+      t.fgSum += (p.fg || 0);
+      t.tpSum += (p.tp || 0);
+      if ((p.ppg || 0) > (t.topPlayer.ppg || 0)) t.topPlayer = p;
+    });
+    const arr = Object.keys(map).map(function (code) {
+      const t = map[code];
+      const n = Math.max(1, t.players);
+      return {
+        code: code, teamName: t.teamName, logo: t.logo, players: t.players,
+        conf: CONFERENCE[code] || "—",
+        avgPpg: t.ppgSum / n, avgRpg: t.rpgSum / n, avgApg: t.apgSum / n,
+        avgFg: t.fgSum / n, avgTp: t.tpSum / n,
+        topPlayer: t.topPlayer
+      };
+    });
+    // Power score: weighted aggregate of normalized stats
+    arr.forEach(function (t) {
+      t.power = (t.avgPpg * 2.0) + (t.avgRpg * 1.2) + (t.avgApg * 1.2) + (t.avgFg * 30) + (t.avgTp * 15);
+    });
+    arr.sort(function (a, b) { return b.power - a.power; });
+    return arr;
+  }
+
+  function renderStandings() {
+    if (!standingsBody) return;
+    const teams = buildTeamAggregates();
+
+    if (standingsTab === "leaders") {
+      renderLeagueLeaders(teams);
+      return;
+    }
+
+    let list = teams;
+    if (standingsTab === "east") list = teams.filter(function (t) { return t.conf === "east"; });
+    else if (standingsTab === "west") list = teams.filter(function (t) { return t.conf === "west"; });
+
+    let html =
+      '<table class="standings-table"><thead><tr>' +
+      '<th>#</th><th>Team</th><th>Conf</th><th class="num">Roster</th>' +
+      '<th class="num">Avg PPG</th><th class="num">Avg RPG</th><th class="num">Avg APG</th>' +
+      '<th class="num">FG%</th><th class="num">3P%</th><th class="num">Power</th><th>Top Scorer</th>' +
+      '</tr></thead><tbody>';
+    list.forEach(function (t, i) {
+      const confTag = t.conf === "east"
+        ? '<span class="conf-tag conf-east">East</span>'
+        : t.conf === "west" ? '<span class="conf-tag conf-west">West</span>' : '—';
+      const logoHtml = t.logo
+        ? '<img src="' + esc(t.logo) + '" alt="" onerror="this.style.display=\'none\'">'
+        : '<span style="display:inline-block;width:26px;height:26px;background:rgba(255,255,255,0.08);border-radius:4px;"></span>';
+      html +=
+        '<tr>' +
+          '<td class="rank">' + (i + 1) + '</td>' +
+          '<td><div class="team-cell">' + logoHtml + '<span>' + esc(t.teamName) + ' <small>(' + esc(t.code) + ')</small></span></div></td>' +
+          '<td>' + confTag + '</td>' +
+          '<td class="num">' + t.players + '</td>' +
+          '<td class="num">' + t.avgPpg.toFixed(1) + '</td>' +
+          '<td class="num">' + t.avgRpg.toFixed(1) + '</td>' +
+          '<td class="num">' + t.avgApg.toFixed(1) + '</td>' +
+          '<td class="num">' + pct(t.avgFg) + '</td>' +
+          '<td class="num">' + pct(t.avgTp) + '</td>' +
+          '<td class="num"><b style="color:var(--nba-gold)">' + t.power.toFixed(0) + '</b></td>' +
+          '<td>' + esc(t.topPlayer.name) + ' <small style="color:rgba(255,255,255,0.5)">' + (t.topPlayer.ppg || 0).toFixed(1) + ' ppg</small></td>' +
+        '</tr>';
+    });
+    html += '</tbody></table>';
+    standingsBody.innerHTML = html;
+  }
+
+  function renderLeagueLeaders(teams) {
+    const data = currentData || PLAYERS;
+    const cats = [
+      { key: "ppg", label: "Points Per Game", max: 35 },
+      { key: "rpg", label: "Rebounds Per Game", max: 15 },
+      { key: "apg", label: "Assists Per Game", max: 12 },
+      { key: "spg", label: "Steals Per Game", max: 3 },
+      { key: "bpg", label: "Blocks Per Game", max: 4 },
+      { key: "tp", label: "3-Point %", isPct: true, max: 1 },
+    ];
+    let html = '<div class="similar-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">';
+    cats.forEach(function (cat) {
+      const top = data.slice().sort(function (a, b) {
+        return (b[cat.key] || 0) - (a[cat.key] || 0);
+      }).slice(0, 5);
+      html += '<div><div style="font-size:12px;text-transform:uppercase;letter-spacing:0.8px;color:var(--nba-gold);font-weight:800;margin-bottom:8px;">' + cat.label + '</div><div class="leaderboard-list">';
+      top.forEach(function (p, idx) {
+        const val = cat.isPct ? pct(p[cat.key]) : (p[cat.key] || 0).toFixed(1);
+        const rk = idx === 0 ? "top1" : idx === 1 ? "top2" : idx === 2 ? "top3" : "";
+        html += '<div class="lb-row ' + rk + '"><div class="lb-rank">' + (idx + 1) + '</div>' +
+          '<div class="lb-name">' + esc(p.name) + '<small>' + esc(p.team || "") + '</small></div>' +
+          '<div class="lb-val">' + val + '</div></div>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+    standingsBody.innerHTML = html;
+  }
+
+  // ---------- Visible Compare Queue ----------
+  function renderCompareQueue() {
+    if (!queueSlotA) return;
+    [queueSlotA, queueSlotB].forEach(function (slotEl, idx) {
+      const name = compareSlots[idx];
+      slotEl.className = "queue-slot " + (idx === 0 ? "slot-a" : "slot-b");
+      if (!name) {
+        slotEl.className += "";
+        slotEl.innerHTML = '<div class="qs-label">Player ' + (idx === 0 ? "A" : "B") + '</div>' +
+          '<div class="qs-empty">Click + on a player card</div>';
+        return;
+      }
+      const p = findPlayerByName(name);
+      slotEl.className += " filled";
+      const logoHtml = (p && p.logo)
+        ? '<img src="' + esc(p.logo) + '" alt="" onerror="this.style.display=\'none\'">'
+        : '<img src="' + esc(teamLogos[p ? p.team : ""] || "") + '" alt="" onerror="this.style.display=\'none\'">';
+      slotEl.innerHTML =
+        '<button class="queue-remove" data-queue-slot="' + idx + '" title="Remove">&times;</button>' +
+        '<div class="qs-label">Player ' + (idx === 0 ? "A" : "B") + '</div>' +
+        '<div class="qs-card">' + logoHtml +
+          '<div class="qs-info"><div class="qs-name">' + esc(p ? p.name : name) + '</div>' +
+          '<div class="qs-team">' + esc(p ? (p.teamName || p.team || "") + " · " + (p.pos || "") : "") + '</div></div>' +
+        '</div>';
+      const rmBtn = slotEl.querySelector(".queue-remove");
+      if (rmBtn) rmBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        compareSlots[idx] = null;
+        updateCompareCount();
+        renderCompareQueue();
+        render();
+      });
+    });
+    const ready = compareSlots[0] && compareSlots[1];
+    queueStartBtn.disabled = !ready;
+  }
+
+  // ---------- Radar chart (SVG) for player modal ----------
+  function buildRadarSvg(p) {
+    const axes = [
+      { key: "ppg", label: "PTS", max: 35 },
+      { key: "rpg", label: "REB", max: 13 },
+      { key: "apg", label: "AST", max: 11 },
+      { key: "spg", label: "STL", max: 3 },
+      { key: "bpg", label: "BLK", max: 3 },
+      { key: "tp", label: "3P%", max: 1, isPct: true },
+    ];
+    const cx = 140, cy = 140, R = 100, n = axes.length;
+    const pt = function (frac, radius) {
+      const ang = -Math.PI / 2 + frac * 2 * Math.PI;
+      return [cx + radius * Math.cos(ang), cy + radius * Math.sin(ang)];
+    };
+    let grid = "";
+    for (let ring = 1; ring <= 4; ring++) {
+      const r = (R * ring) / 4;
+      let pts = "";
+      for (let i = 0; i < n; i++) {
+        const xy = pt(i / n, r);
+        pts += xy[0].toFixed(1) + "," + xy[1].toFixed(1) + " ";
+      }
+      grid += '<polygon points="' + pts + '" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>';
+    }
+    let spokes = "";
+    let labels = "";
+    axes.forEach(function (a, i) {
+      const xy = pt(i / n, R);
+      spokes += '<line x1="' + cx + '" y1="' + cy + '" x2="' + xy[0].toFixed(1) + '" y2="' + xy[1].toFixed(1) + '" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>';
+      const lxy = pt(i / n, R + 16);
+      labels += '<text class="radar-axis-label" x="' + lxy[0].toFixed(1) + '" y="' + lxy[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle">' + a.label + '</text>';
+    });
+    let shapePts = "";
+    let dots = "";
+    axes.forEach(function (a, i) {
+      const v = Math.max(0, Math.min(1, (p[a.key] || 0) / a.max));
+      const xy = pt(i / n, R * v);
+      shapePts += xy[0].toFixed(1) + "," + xy[1].toFixed(1) + " ";
+      dots += '<circle class="radar-dot" cx="' + xy[0].toFixed(1) + '" cy="' + xy[1].toFixed(1) + '" r="3.5"/>';
+    });
+    return '<svg class="radar-svg" viewBox="0 0 280 280">' +
+      grid + spokes +
+      '<polygon class="radar-shape" points="' + shapePts + '"/>' +
+      dots + labels +
+    '</svg>';
+  }
+
+  // ---------- Similar players (stat-profile distance) ----------
+  function findSimilarPlayers(p, limit) {
+    const axes = ["ppg","rpg","apg","spg","bpg","fg","tp","ft"];
+    const maxes = { ppg:35, rpg:13, apg:11, spg:3, bpg:3, fg:1, tp:1, ft:1 };
+    const norm = function (pl) {
+      return axes.map(function (k) { return (pl[k] || 0) / maxes[k]; });
+    };
+    const target = norm(p);
+    const all = (currentData || PLAYERS).filter(function (x) { return x.name !== p.name; });
+    all.forEach(function (x) {
+      const v = norm(x);
+      let dist = 0;
+      for (let i = 0; i < v.length; i++) { const d = target[i] - v[i]; dist += d * d; }
+      x._simDist = Math.sqrt(dist);
+    });
+    all.sort(function (a, b) { return a._simDist - b._simDist; });
+    return all.slice(0, limit || 4).map(function (x) {
+      const maxDist = Math.sqrt(axes.length);
+      const match = Math.max(0, Math.round((1 - x._simDist / maxDist) * 100));
+      return { player: x, match: match };
+    });
+  }
+
+  function buildStrengthTags(p) {
+    const tags = [];
+    const league = currentData || PLAYERS;
+    const avg = function (k) {
+      let s = 0; league.forEach(function (x) { s += (x[k] || 0); }); return s / Math.max(1, league.length);
+    };
+    const checks = [
+      { key: "ppg", label: "Elite Scorer", thr: 25 },
+      { key: "rpg", label: "Glass Cleaner", thr: 10 },
+      { key: "apg", label: "Playmaker", thr: 7 },
+      { key: "spg", label: "Ball Hawk", thr: 1.5 },
+      { key: "bpg", label: "Rim Protector", thr: 1.5 },
+      { key: "tp", label: "Sniper", thr: 0.4, isPct: true },
+      { key: "fg", label: "Efficient", thr: 0.55, isPct: true },
+    ];
+    checks.forEach(function (c) {
+      const v = p[c.key] || 0;
+      const disp = c.isPct ? v : v;
+      if (disp >= c.thr) tags.push({ label: c.label, weak: false });
+    });
+    // weaknesses
+    if ((p.tp || 0) < 0.30 && (p.ppg || 0) > 10) tags.push({ label: "Cold 3PT", weak: true });
+    if ((p.ft || 0) < 0.70) tags.push({ label: "Foul Risk", weak: true });
+    if ((p.top || 0) > 3) tags.push({ label: "Turnover Prone", weak: true });
+    return tags;
+  }
+
   // ---------- Render player cards ----------
   function render() {
     const q = searchInput.value.trim().toLowerCase();
     const tf = teamFilter.value;
     const pf = posFilter.value;
     const sb = sortBy.value;
+    const sf = statRangeField.value;
+    const sm = parseFloat(statRangeMin.value);
 
     let list = (currentData || PLAYERS).filter(function (p) {
       if (tf && p.team !== tf) return false;
       if (pf && p.pos !== pf) return false;
+      if (sf && !isNaN(sm) && (p[sf] || 0) < sm) return false;
       if (q) {
         const hay = (p.name + " " + (p.team || "") + " " + (p.teamName || "")).toLowerCase();
         if (hay.indexOf(q) === -1) return false;
@@ -2718,6 +3287,41 @@ try {
     const logoHtml = p.logo
       ? '<img class="mh-logo" src="' + esc(p.logo) + '" alt="">'
       : '<div class="mh-logo" style="display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;">&#127936;</div>';
+
+    // Strength / weakness tags
+    const tags = buildStrengthTags(p);
+    let tagsHtml = '<div class="player-strengths">';
+    if (tags.length === 0) tagsHtml += '<span class="strength-tag" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.1);">Balanced profile</span>';
+    tags.forEach(function (t) {
+      tagsHtml += '<span class="strength-tag' + (t.weak ? " weak" : "") + '">' + esc(t.label) + "</span>";
+    });
+    tagsHtml += "</div>";
+
+    // Radar chart
+    const radarHtml = buildRadarSvg(p);
+
+    // Similar players
+    const similar = findSimilarPlayers(p, 4);
+    let similarHtml = '<div class="similar-section"><h4>Similar Players</h4><div class="similar-grid">';
+    if (similar.length === 0) {
+      similarHtml += '<div style="color:rgba(255,255,255,0.4);font-size:13px;">No comparable players found.</div>';
+    }
+    similar.forEach(function (s) {
+      similarHtml += '<div class="similar-card" data-similar-name="' + esc(s.player.name) + '">' +
+        '<div class="sc-name">' + esc(s.player.name) + "</div>" +
+        '<div class="sc-team">' + esc(s.player.team || "") + " · " + esc(s.player.pos || "") + "</div>" +
+        '<div class="sc-match">' + s.match + "% match</div>" +
+      "</div>";
+    });
+    similarHtml += "</div></div>";
+
+    // Action buttons
+    const inCompare = compareSlots.indexOf(p.name) !== -1;
+    const actionsHtml = '<div class="modal-actions">' +
+      '<button class="modal-act-btn primary" id="modal-add-compare">' + (inCompare ? "&#10003; In Compare Queue" : "&#10133; Add to Compare") + "</button>" +
+      '<button class="modal-act-btn" id="modal-find-team">View Team</button>' +
+    "</div>";
+
     modal.innerHTML =
       '<div class="modal-head">' +
         '<button class="close-btn" id="modal-close">&times;</button>' +
@@ -2734,6 +3338,7 @@ try {
           '<div class="info-item"><div class="il">College</div><div class="iv">' + esc(p.college || "N/A") + "</div></div>" +
           '<div class="info-item"><div class="il">Source</div><div class="iv">' + (currentSource === "live" ? "Live API" : currentSource === "cache" ? "Cache" : "Static") + "</div></div>" +
         "</div>" +
+        tagsHtml +
         '<h4>Per-Game Stats</h4>' +
         '<div class="stat-grid">' +
           '<div class="stat-box"><div class="sv">' + (p.ppg || 0).toFixed(1) + '</div><div class="sl">Points</div></div>' +
@@ -2749,9 +3354,41 @@ try {
           '<div class="stat-box"><div class="sv">' + pct(p.tp) + '</div><div class="sl">3P %</div></div>' +
           '<div class="stat-box"><div class="sv">' + pct(p.ft) + '</div><div class="sl">FT %</div></div>' +
         "</div>" +
+        '<h4 style="margin-top:20px;">Skill Profile</h4>' +
+        '<div class="radar-wrap">' + radarHtml + "</div>" +
+        similarHtml +
+        actionsHtml +
       "</div>";
     modalOverlay.classList.add("show");
     document.getElementById("modal-close").addEventListener("click", closeModal);
+
+    // Wire action buttons
+    const addCompareBtn = document.getElementById("modal-add-compare");
+    if (addCompareBtn) {
+      addCompareBtn.addEventListener("click", function () {
+        toggleCompareSlot(p.name);
+        closeModal();
+      });
+    }
+    const viewTeamBtn = document.getElementById("modal-find-team");
+    if (viewTeamBtn) {
+      viewTeamBtn.addEventListener("click", function () {
+        if (p.team) {
+          teamFilter.value = p.team;
+          closeModal();
+          render();
+          document.getElementById("player-grid").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    }
+    // Wire similar-player cards
+    modal.querySelectorAll(".similar-card").forEach(function (card) {
+      card.addEventListener("click", function () {
+        const nm = card.getAttribute("data-similar-name");
+        const sp = findPlayerByName(nm);
+        if (sp) openModal(sp);
+      });
+    });
   }
 
   function closeModal() {
@@ -2822,6 +3459,7 @@ try {
       else compareSlots[1] = name;
     }
     updateCompareCount();
+    renderCompareQueue();
     render();
   }
 
@@ -2930,8 +3568,30 @@ try {
   teamFilter.addEventListener("change", render);
   posFilter.addEventListener("change", render);
   sortBy.addEventListener("change", render);
+  statRangeField.addEventListener("change", render);
+  statRangeMin.addEventListener("input", render);
+  clearRangeBtn.addEventListener("click", function () {
+    statRangeField.value = "";
+    statRangeMin.value = "";
+    render();
+  });
   refreshBtn.addEventListener("click", function () {
     loadData();
+  });
+
+  // Standings tab switching
+  document.querySelectorAll("[data-standings-tab]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("[data-standings-tab]").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      standingsTab = btn.getAttribute("data-standings-tab");
+      renderStandings();
+    });
+  });
+
+  // Compare queue "Compare Now" button
+  queueStartBtn.addEventListener("click", function () {
+    if (compareSlots[0] && compareSlots[1]) openCompare();
   });
 
   // ---------- Init ----------
