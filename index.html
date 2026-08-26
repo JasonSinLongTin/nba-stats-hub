@@ -2071,6 +2071,13 @@
     border-radius: 12px;
     text-align: center;
   }
+  .pick-empty.pick-confirmed {
+    color: #8ddb5b;
+    border: 1px solid rgba(141,219,91,0.4);
+    background: rgba(141,219,91,0.08);
+    font-weight: 600;
+    animation: pickPop 0.4s ease;
+  }
   .pick-card {
     display: flex;
     align-items: center;
@@ -4713,7 +4720,8 @@ try {
     currentPick: null,   // { player, year, team }
     slots: { PG: null, SG: null, SF: null, PF: null, C: null },
     rolls: 0,
-    bestWins: -1
+    bestWins: -1,
+    draftMsg: ""
   };
 
   var rollBtn = document.getElementById("roll-btn");
@@ -4763,7 +4771,12 @@ try {
   function renderCurrentPick() {
     var pick = gameState.currentPick;
     if (!pick) {
-      currentPickAreaEl.innerHTML = '<div class="pick-empty">Your rolled pick will appear here.</div>';
+      // Show draft confirmation or empty state
+      var msg = gameState.draftMsg;
+      currentPickAreaEl.innerHTML =
+        '<div class="pick-empty' + (msg ? ' pick-confirmed' : '') + '">' +
+          (msg || 'Your rolled pick will appear here.') +
+        '</div>';
       return;
     }
     var p = pick.player;
@@ -4808,8 +4821,9 @@ try {
       year: pick.year,
       team: pick.team
     };
-    // Clear current pick after drafting
+    // Clear current pick after drafting, show confirmation
     gameState.currentPick = null;
+    gameState.draftMsg = "\u2713 " + p.name + " drafted to " + p.pos + "! Roll again for your next player.";
     renderSlots();
     renderCurrentPick();
   }
@@ -4819,11 +4833,14 @@ try {
     setTimeout(function () { rollBtn.classList.remove("rolling"); }, 500);
     var pick = rollSinglePick();
     gameState.currentPick = pick;
+    gameState.draftMsg = "";
     gameState.rolls++;
     rollsCountEl.textContent = gameState.rolls;
     rollYearEl.textContent = pick.year;
     rollTeamEl.textContent = pick.team;
     gameResultEl.classList.add("hidden");
+    // Re-render slots too so drafted players always stay visible
+    renderSlots();
     renderCurrentPick();
   }
 
@@ -4881,6 +4898,7 @@ try {
   function resetGame() {
     gameState.slots = { PG: null, SG: null, SF: null, PF: null, C: null };
     gameState.currentPick = null;
+    gameState.draftMsg = "";
     gameResultEl.classList.add("hidden");
     renderSlots();
     renderCurrentPick();
