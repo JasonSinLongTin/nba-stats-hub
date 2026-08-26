@@ -2006,9 +2006,6 @@
   }
 
   .roster-area {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
     min-height: 80px;
   }
   .roster-empty {
@@ -2055,6 +2052,55 @@
   .tier-star { color: var(--nba-gold); }
   .tier-super { color: #ff6ec7; }
   .tier-legend { color: #8ddb5b; }
+
+  /* ---------- Roster grid (for the rolled team) ---------- */
+  .roster-pick-hint {
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .roster-pick-hint .roster-active { color: var(--nba-gold); }
+  .roster-pick-hint .roster-done { color: #8ddb5b; }
+  .roster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .roster-card {
+    padding: 12px 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+    position: relative;
+  }
+  .roster-card:hover {
+    border-color: var(--nba-gold);
+    background: rgba(253,185,39,0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 14px rgba(253,185,39,0.2);
+  }
+  .roster-card.elite { border-color: rgba(141,219,91,0.4); }
+  .roster-card.elite:hover { border-color: #8ddb5b; box-shadow: 0 4px 16px rgba(141,219,91,0.3); }
+  .roster-card.taken { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+  .roster-card.taken::after {
+    content: "\2713 Drafted";
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #8ddb5b; font-size: 13px; font-weight: 800;
+    background: rgba(0,0,0,0.4);
+    border-radius: 10px;
+  }
+  .rc-replace-hint {
+    font-size: 9px;
+    color: var(--nba-red);
+    margin-top: 3px;
+    font-weight: 700;
+  }
+  body[data-theme="light"] .roster-card { background: #fff; border-color: rgba(22,32,51,0.12); }
+  body[data-theme="light"] .roster-card:hover { background: rgba(253,185,39,0.1); }
 
   /* ---------- Current pick (single rolled player) ---------- */
   .current-pick-area {
@@ -2752,7 +2798,7 @@ try {
     <!-- ============ ROSTER ROLL MINI-GAME ============ -->
     <section id="section-game" class="game-section">
       <h2 style="margin-top:32px;">&#127922; Roster Roll</h2>
-      <p class="game-intro">Each roll pulls <b>one player</b> from a random <b>year</b> + <b>team</b>. Draft them into their position slot, then roll again for a different era and franchise. Fill all 5 slots (PG, SG, SF, PF, C) and let the AI predict your season. Go <b class="perfect">82-0</b> to win!</p>
+      <p class="game-intro">Roll a random <b>year</b> + <b>team</b>, see their roster, and draft <b>one player</b> from that squad. Roll again for a different era and franchise — each team/year gives you only one pick. Fill all 5 slots (PG, SG, SF, PF, C) and let the AI predict your season. Go <b class="perfect">82-0</b> to win!</p>
 
       <div class="game-board">
         <div class="game-stage">
@@ -2761,11 +2807,11 @@ try {
             <div class="roll-year" id="roll-year">—</div>
             <div class="roll-team" id="roll-team">Press "Roll" to begin</div>
           </div>
-          <div class="roll-hint" id="roll-hint">Each roll = 1 player from 1 team in 1 year. Like the player? Draft them. Don't? Roll again for a fresh era.</div>
+          <div class="roll-hint" id="roll-hint">Each roll reveals a full team roster for that year. Pick ONE player — then roll for a new era. Each team/year can only contribute one player.</div>
         </div>
 
-        <div class="current-pick-area" id="current-pick-area">
-          <div class="pick-empty">Your rolled pick will appear here.</div>
+        <div class="roster-area" id="roster-area">
+          <div class="roster-empty">Roll a year + team to reveal their roster. You can draft <b>one player</b> per team/era.</div>
         </div>
 
         <div class="game-slots" id="game-slots">
@@ -4706,22 +4752,34 @@ try {
     return { name: first + " " + last, pos: pos, rating: rating };
   }
 
-  // Roll one player from a random year + team
-  function rollSinglePick() {
-    var year = 1980 + Math.floor(Math.random() * 45); // 1980-2024
-    var team = NBA_TEAMS_GAME[Math.floor(Math.random() * NBA_TEAMS_GAME.length)];
-    var pos = POSITIONS_GAME[Math.floor(Math.random() * POSITIONS_GAME.length)];
-    var player = rollPlayer(pos);
-    return { player: player, year: year, team: team };
+  // Generate a full roster (~10 players) for a team/year, covering all 5 positions
+  function rollRosterForTeam(year, team) {
+    var roster = [];
+    var usedNames = {};
+    // Ensure at least 2 players per position for choice
+    POSITIONS_GAME.forEach(function (pos) {
+      for (var i = 0; i < 2; i++) {
+        var pl;
+        do { pl = rollPlayer(pos); } while (usedNames[pl.name]);
+        usedNames[pl.name] = 1;
+        roster.push(pl);
+      }
+    });
+    // sort by rating desc for display
+    roster.sort(function (a, b) { return b.rating - a.rating; });
+    return roster;
   }
 
   // --- Game state ---
   var gameState = {
-    currentPick: null,   // { player, year, team }
+    currentYear: null,
+    currentTeam: null,
+    currentRoster: [],
+    draftedFromCurrent: false,  // has a player been drafted from the current roll?
+    usedCombos: {},             // "year|team" -> true, to prevent re-rolling same combo
     slots: { PG: null, SG: null, SF: null, PF: null, C: null },
     rolls: 0,
-    bestWins: -1,
-    draftMsg: ""
+    bestWins: -1
   };
 
   var rollBtn = document.getElementById("roll-btn");
@@ -4737,7 +4795,7 @@ try {
   var recordLossesEl = document.getElementById("record-losses");
   var resultVerdictEl = document.getElementById("result-verdict");
   var resultBarEl = document.getElementById("result-bar");
-  var currentPickAreaEl = document.getElementById("current-pick-area");
+  var rosterAreaEl = document.getElementById("roster-area");
 
   function renderSlots() {
     var slots = gameSlotsEl.querySelectorAll(".slot");
@@ -4768,80 +4826,86 @@ try {
     predictBtn.disabled = !allFilled;
   }
 
-  function renderCurrentPick() {
-    var pick = gameState.currentPick;
-    if (!pick) {
-      // Show draft confirmation or empty state
-      var msg = gameState.draftMsg;
-      currentPickAreaEl.innerHTML =
-        '<div class="pick-empty' + (msg ? ' pick-confirmed' : '') + '">' +
-          (msg || 'Your rolled pick will appear here.') +
-        '</div>';
+  function renderRoster() {
+    if (!gameState.currentRoster.length) {
+      rosterAreaEl.innerHTML = '<div class="roster-empty">Roll a year + team to reveal their roster. You can draft <b>one player</b> per team/era.</div>';
       return;
     }
-    var p = pick.player;
-    var tier = ratingTier(p.rating);
-    var slotTaken = !!gameState.slots[p.pos];
-    var draftLabel = slotTaken ? "Replace " + p.pos : "Draft to " + p.pos;
-    currentPickAreaEl.innerHTML =
-      '<div class="pick-card ' + (tier.elite ? "elite" : "") + '">' +
-        '<div class="pick-rating-block">' +
-          '<div class="pick-rating">' + p.rating + '</div>' +
-          '<div class="pick-tier ' + tier.cls + '">' + tier.name + '</div>' +
-        '</div>' +
-        '<div class="pick-info">' +
-          '<div class="pick-name">' + p.name + '</div>' +
-          '<div class="pick-meta">' +
-            '<span class="pick-badge pos">' + p.pos + '</span>' +
-            '<span class="pick-badge year">' + pick.year + '</span>' +
-            '<span class="pick-badge team">' + pick.team + '</span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="pick-actions">' +
-          '<button class="draft-btn" id="draft-btn">' + draftLabel + '</button>' +
-          '<button class="reroll-btn" id="reroll-btn">&#127922; Re-roll</button>' +
-        '</div>' +
+    var html = '<div class="roster-pick-hint">' +
+      (gameState.draftedFromCurrent
+        ? '<span class="roster-done">&#10003; You drafted from this team. Roll again for a new era.</span>'
+        : '<span class="roster-active">Pick ONE player from this roster to draft:</span>') +
       '</div>';
-    // bind draft
-    var draftBtn = document.getElementById("draft-btn");
-    if (draftBtn) draftBtn.addEventListener("click", draftCurrentPick);
-    var rerollBtn = document.getElementById("reroll-btn");
-    if (rerollBtn) rerollBtn.addEventListener("click", doRoll);
+    html += '<div class="roster-grid">';
+    gameState.currentRoster.forEach(function (p, idx) {
+      var tier = ratingTier(p.rating);
+      var disabled = gameState.draftedFromCurrent;
+      var slotTaken = !!gameState.slots[p.pos];
+      html +=
+        '<div class="roster-card ' + (tier.elite ? "elite" : "") + (disabled ? " taken" : "") + '" data-idx="' + idx + '">' +
+          '<div class="rc-name">' + p.name + '</div>' +
+          '<div class="rc-pos">' + p.pos + '</div>' +
+          '<div class="rc-rating">' + p.rating + '</div>' +
+          '<div class="rc-tier ' + tier.cls + '">' + tier.name + '</div>' +
+          (slotTaken && !disabled ? '<div class="rc-replace-hint">replaces ' + p.pos + '</div>' : '') +
+        '</div>';
+    });
+    html += '</div>';
+    rosterAreaEl.innerHTML = html;
+    // bind clicks only if not yet drafted
+    if (!gameState.draftedFromCurrent) {
+      rosterAreaEl.querySelectorAll(".roster-card").forEach(function (card) {
+        card.addEventListener("click", function () {
+          if (card.classList.contains("taken")) return;
+          var idx = parseInt(card.getAttribute("data-idx"), 10);
+          draftFromRoster(idx);
+        });
+      });
+    }
   }
 
-  function draftCurrentPick() {
-    var pick = gameState.currentPick;
-    if (!pick) return;
-    var p = pick.player;
-    // Store pick details into the matching slot (replaces existing)
+  function draftFromRoster(idx) {
+    var p = gameState.currentRoster[idx];
+    if (!p || gameState.draftedFromCurrent) return;
+    // Place into matching position slot (replaces existing)
     gameState.slots[p.pos] = {
       name: p.name,
       pos: p.pos,
       rating: p.rating,
-      year: pick.year,
-      team: pick.team
+      year: gameState.currentYear,
+      team: gameState.currentTeam
     };
-    // Clear current pick after drafting, show confirmation
-    gameState.currentPick = null;
-    gameState.draftMsg = "\u2713 " + p.name + " drafted to " + p.pos + "! Roll again for your next player.";
+    // Mark this team/year combo as used — only one player per team/era
+    var combo = gameState.currentYear + "|" + gameState.currentTeam;
+    gameState.usedCombos[combo] = true;
+    gameState.draftedFromCurrent = true;
     renderSlots();
-    renderCurrentPick();
+    renderRoster();
   }
 
   function doRoll() {
     rollBtn.classList.add("rolling");
     setTimeout(function () { rollBtn.classList.remove("rolling"); }, 500);
-    var pick = rollSinglePick();
-    gameState.currentPick = pick;
-    gameState.draftMsg = "";
+    // Pick a random year+team not already used
+    var year, team, combo, attempts = 0;
+    do {
+      year = 1980 + Math.floor(Math.random() * 45); // 1980-2024
+      team = NBA_TEAMS_GAME[Math.floor(Math.random() * NBA_TEAMS_GAME.length)];
+      combo = year + "|" + team;
+      attempts++;
+    } while (gameState.usedCombos[combo] && attempts < 50);
+    // Generate roster for this team/year
+    gameState.currentYear = year;
+    gameState.currentTeam = team;
+    gameState.currentRoster = rollRosterForTeam(year, team);
+    gameState.draftedFromCurrent = false;
     gameState.rolls++;
     rollsCountEl.textContent = gameState.rolls;
-    rollYearEl.textContent = pick.year;
-    rollTeamEl.textContent = pick.team;
+    rollYearEl.textContent = year;
+    rollTeamEl.textContent = team;
     gameResultEl.classList.add("hidden");
-    // Re-render slots too so drafted players always stay visible
     renderSlots();
-    renderCurrentPick();
+    renderRoster();
   }
 
   // AI prediction: map avg rating -> wins, with variance. 82-0 only at near-perfect ratings.
@@ -4897,11 +4961,14 @@ try {
 
   function resetGame() {
     gameState.slots = { PG: null, SG: null, SF: null, PF: null, C: null };
-    gameState.currentPick = null;
-    gameState.draftMsg = "";
+    gameState.currentYear = null;
+    gameState.currentTeam = null;
+    gameState.currentRoster = [];
+    gameState.draftedFromCurrent = false;
+    gameState.usedCombos = {};
     gameResultEl.classList.add("hidden");
     renderSlots();
-    renderCurrentPick();
+    renderRoster();
   }
 
   if (rollBtn) rollBtn.addEventListener("click", doRoll);
