@@ -2056,6 +2056,150 @@
   .tier-super { color: #ff6ec7; }
   .tier-legend { color: #8ddb5b; }
 
+  /* ---------- Current pick (single rolled player) ---------- */
+  .current-pick-area {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pick-empty {
+    color: rgba(255,255,255,0.4);
+    font-size: 14px;
+    padding: 32px;
+    border: 1px dashed rgba(255,255,255,0.18);
+    border-radius: 12px;
+    text-align: center;
+  }
+  .pick-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 22px;
+    background: linear-gradient(135deg, rgba(253,185,39,0.12), rgba(23,64,139,0.4));
+    border: 2px solid rgba(253,185,39,0.5);
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(253,185,39,0.2);
+    animation: pickPop 0.4s ease;
+    width: 100%;
+    max-width: 560px;
+  }
+  .pick-card.elite {
+    border-color: #8ddb5b;
+    box-shadow: 0 6px 28px rgba(141,219,91,0.35);
+    background: linear-gradient(135deg, rgba(141,219,91,0.14), rgba(23,64,139,0.4));
+  }
+  @keyframes pickPop {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .pick-rating-block {
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .pick-rating {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--nba-gold);
+    line-height: 1;
+  }
+  .pick-card.elite .pick-rating { color: #8ddb5b; }
+  .pick-tier {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  .pick-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .pick-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .pick-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .pick-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.82);
+  }
+  .pick-badge.pos { background: rgba(23,64,139,0.45); border-color: rgba(109,184,255,0.4); color: #6db8ff; }
+  .pick-badge.year { background: rgba(253,185,39,0.15); border-color: rgba(253,185,39,0.35); color: var(--nba-gold); }
+  .pick-badge.team { background: rgba(201,8,42,0.2); border-color: rgba(201,8,42,0.4); color: #ff8a8a; }
+  .pick-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .draft-btn {
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0a0e27;
+    background: linear-gradient(135deg, var(--nba-gold), #f6a609);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(253,185,39,0.4);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .draft-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(253,185,39,0.55); }
+  .draft-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .reroll-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .reroll-btn:hover { background: rgba(23,64,139,0.4); border-color: #6db8ff; color: #6db8ff; }
+
+  /* ---------- Slot badges (team/year on filled slots) ---------- */
+  .slot-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 3px;
+  }
+  .slot-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 999px;
+    line-height: 1.3;
+  }
+  .slot-badge.year { background: rgba(253,185,39,0.18); color: var(--nba-gold); }
+  .slot-badge.team { background: rgba(201,8,42,0.2); color: #ff8a8a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+  body[data-theme="light"] .pick-card { background: linear-gradient(135deg, rgba(253,185,39,0.15), rgba(255,255,255,0.9)); }
+  body[data-theme="light"] .pick-empty { color: rgba(22,32,51,0.5); border-color: rgba(22,32,51,0.18); }
+  body[data-theme="light"] .pick-name { color: #162033; }
+  body[data-theme="light"] .pick-badge { background: rgba(22,32,51,0.06); color: #162033; }
+  body[data-theme="light"] .draft-btn { color: #162033; }
+
   body[data-theme="light"] .side-nav { background: linear-gradient(180deg, #fff, #f5efe0); border-color: rgba(201,8,42,0.2); }
   body[data-theme="light"] .side-nav-link { color: #162033; }
   body[data-theme="light"] .side-nav-link:hover { background: rgba(253,185,39,0.15); }
@@ -2601,7 +2745,7 @@ try {
     <!-- ============ ROSTER ROLL MINI-GAME ============ -->
     <section id="section-game" class="game-section">
       <h2 style="margin-top:32px;">&#127922; Roster Roll</h2>
-      <p class="game-intro">Roll a random <b>year</b> + <b>team</b>, draft one player into each of the 5 position slots (PG, SG, SF, PF, C), then let the AI predict your season record. Go <b class="perfect">82-0</b> to win!</p>
+      <p class="game-intro">Each roll pulls <b>one player</b> from a random <b>year</b> + <b>team</b>. Draft them into their position slot, then roll again for a different era and franchise. Fill all 5 slots (PG, SG, SF, PF, C) and let the AI predict your season. Go <b class="perfect">82-0</b> to win!</p>
 
       <div class="game-board">
         <div class="game-stage">
@@ -2610,34 +2754,38 @@ try {
             <div class="roll-year" id="roll-year">—</div>
             <div class="roll-team" id="roll-team">Press "Roll" to begin</div>
           </div>
-          <div class="roll-hint" id="roll-hint">Each roll generates a fresh roster with random player ratings (40-99). Draft the best 5 to chase a perfect season.</div>
+          <div class="roll-hint" id="roll-hint">Each roll = 1 player from 1 team in 1 year. Like the player? Draft them. Don't? Roll again for a fresh era.</div>
+        </div>
+
+        <div class="current-pick-area" id="current-pick-area">
+          <div class="pick-empty">Your rolled pick will appear here.</div>
         </div>
 
         <div class="game-slots" id="game-slots">
           <div class="slot" data-pos="PG">
             <div class="slot-pos">PG</div>
-            <div class="slot-name">Empty</div>
-            <div class="slot-rating">—</div>
+            <div class="slot-empty-mark">&mdash;</div>
+            <div class="slot-name" style="opacity:0.4;font-size:11px;">Empty</div>
           </div>
           <div class="slot" data-pos="SG">
             <div class="slot-pos">SG</div>
-            <div class="slot-name">Empty</div>
-            <div class="slot-rating">—</div>
+            <div class="slot-empty-mark">&mdash;</div>
+            <div class="slot-name" style="opacity:0.4;font-size:11px;">Empty</div>
           </div>
           <div class="slot" data-pos="SF">
             <div class="slot-pos">SF</div>
-            <div class="slot-name">Empty</div>
-            <div class="slot-rating">—</div>
+            <div class="slot-empty-mark">&mdash;</div>
+            <div class="slot-name" style="opacity:0.4;font-size:11px;">Empty</div>
           </div>
           <div class="slot" data-pos="PF">
             <div class="slot-pos">PF</div>
-            <div class="slot-name">Empty</div>
-            <div class="slot-rating">—</div>
+            <div class="slot-empty-mark">&mdash;</div>
+            <div class="slot-name" style="opacity:0.4;font-size:11px;">Empty</div>
           </div>
           <div class="slot" data-pos="C">
             <div class="slot-pos">C</div>
-            <div class="slot-name">Empty</div>
-            <div class="slot-rating">—</div>
+            <div class="slot-empty-mark">&mdash;</div>
+            <div class="slot-name" style="opacity:0.4;font-size:11px;">Empty</div>
           </div>
         </div>
 
@@ -2661,10 +2809,6 @@ try {
             <div class="result-bar-marker" style="left:100%;"></div>
           </div>
           <div class="result-scale"><span>0W</span><span>41W (.500)</span><span>82W (perfect)</span></div>
-        </div>
-
-        <div class="roster-area" id="roster-area">
-          <div class="roster-empty">Roll a year + team to reveal your roster.</div>
         </div>
       </div>
     </section>
@@ -4555,34 +4699,18 @@ try {
     return { name: first + " " + last, pos: pos, rating: rating };
   }
 
-  function rollRoster() {
-    // 12 players, ensure at least 1 per position, rest random
-    var roster = [];
-    var usedNames = {};
-    POSITIONS_GAME.forEach(function (p) {
-      var pl;
-      do { pl = rollPlayer(p); } while (usedNames[pl.name]);
-      usedNames[pl.name] = 1;
-      roster.push(pl);
-    });
-    // add 7 more random-position players
-    for (var i = 0; i < 7; i++) {
-      var p = POSITIONS_GAME[Math.floor(Math.random() * POSITIONS_GAME.length)];
-      var pl;
-      do { pl = rollPlayer(p); } while (usedNames[pl.name]);
-      usedNames[pl.name] = 1;
-      roster.push(pl);
-    }
-    // sort by rating desc for nice display
-    roster.sort(function (a, b) { return b.rating - a.rating; });
-    return roster;
+  // Roll one player from a random year + team
+  function rollSinglePick() {
+    var year = 1980 + Math.floor(Math.random() * 45); // 1980-2024
+    var team = NBA_TEAMS_GAME[Math.floor(Math.random() * NBA_TEAMS_GAME.length)];
+    var pos = POSITIONS_GAME[Math.floor(Math.random() * POSITIONS_GAME.length)];
+    var player = rollPlayer(pos);
+    return { player: player, year: year, team: team };
   }
 
   // --- Game state ---
   var gameState = {
-    year: null,
-    team: null,
-    roster: [],
+    currentPick: null,   // { player, year, team }
     slots: { PG: null, SG: null, SF: null, PF: null, C: null },
     rolls: 0,
     bestWins: -1
@@ -4601,7 +4729,7 @@ try {
   var recordLossesEl = document.getElementById("record-losses");
   var resultVerdictEl = document.getElementById("result-verdict");
   var resultBarEl = document.getElementById("result-bar");
-  var rosterAreaEl = document.getElementById("roster-area");
+  var currentPickAreaEl = document.getElementById("current-pick-area");
 
   function renderSlots() {
     var slots = gameSlotsEl.querySelectorAll(".slot");
@@ -4615,7 +4743,11 @@ try {
         slotEl.innerHTML =
           '<div class="slot-pos">' + pos + '</div>' +
           '<div class="slot-name">' + p.name + '</div>' +
-          '<div class="slot-rating">' + p.rating + '</div>';
+          '<div class="slot-rating">' + p.rating + '</div>' +
+          '<div class="slot-meta">' +
+            '<span class="slot-badge year">' + p.year + '</span>' +
+            '<span class="slot-badge team">' + p.team + '</span>' +
+          '</div>';
       } else {
         slotEl.classList.remove("filled", "elite");
         slotEl.innerHTML =
@@ -4628,53 +4760,71 @@ try {
     predictBtn.disabled = !allFilled;
   }
 
-  function renderRoster() {
-    if (!gameState.roster.length) {
-      rosterAreaEl.innerHTML = '<div class="roster-empty">Roll a year + team to reveal your roster.</div>';
+  function renderCurrentPick() {
+    var pick = gameState.currentPick;
+    if (!pick) {
+      currentPickAreaEl.innerHTML = '<div class="pick-empty">Your rolled pick will appear here.</div>';
       return;
     }
-    var html = "";
-    gameState.roster.forEach(function (p, idx) {
-      var tier = ratingTier(p.rating);
-      var taken = gameState.slots[p.pos] && gameState.slots[p.pos].name === p.name && gameState.slots[p.pos].rating === p.rating;
-      html +=
-        '<div class="roster-card ' + (tier.elite ? "elite" : "") + (taken ? " taken" : "") + '" data-idx="' + idx + '">' +
-          '<div class="rc-name">' + p.name + '</div>' +
-          '<div class="rc-pos">' + p.pos + '</div>' +
-          '<div class="rc-rating">' + p.rating + '</div>' +
-          '<div class="rc-tier ' + tier.cls + '">' + tier.name + '</div>' +
-        '</div>';
-    });
-    rosterAreaEl.innerHTML = html;
-    // bind clicks
-    rosterAreaEl.querySelectorAll(".roster-card").forEach(function (card) {
-      card.addEventListener("click", function () {
-        if (card.classList.contains("taken")) return;
-        var idx = parseInt(card.getAttribute("data-idx"), 10);
-        var p = gameState.roster[idx];
-        // fill the matching position slot (replaces any existing)
-        gameState.slots[p.pos] = p;
-        renderSlots();
-        renderRoster();
-      });
-    });
+    var p = pick.player;
+    var tier = ratingTier(p.rating);
+    var slotTaken = !!gameState.slots[p.pos];
+    var draftLabel = slotTaken ? "Replace " + p.pos : "Draft to " + p.pos;
+    currentPickAreaEl.innerHTML =
+      '<div class="pick-card ' + (tier.elite ? "elite" : "") + '">' +
+        '<div class="pick-rating-block">' +
+          '<div class="pick-rating">' + p.rating + '</div>' +
+          '<div class="pick-tier ' + tier.cls + '">' + tier.name + '</div>' +
+        '</div>' +
+        '<div class="pick-info">' +
+          '<div class="pick-name">' + p.name + '</div>' +
+          '<div class="pick-meta">' +
+            '<span class="pick-badge pos">' + p.pos + '</span>' +
+            '<span class="pick-badge year">' + pick.year + '</span>' +
+            '<span class="pick-badge team">' + pick.team + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pick-actions">' +
+          '<button class="draft-btn" id="draft-btn">' + draftLabel + '</button>' +
+          '<button class="reroll-btn" id="reroll-btn">&#127922; Re-roll</button>' +
+        '</div>' +
+      '</div>';
+    // bind draft
+    var draftBtn = document.getElementById("draft-btn");
+    if (draftBtn) draftBtn.addEventListener("click", draftCurrentPick);
+    var rerollBtn = document.getElementById("reroll-btn");
+    if (rerollBtn) rerollBtn.addEventListener("click", doRoll);
+  }
+
+  function draftCurrentPick() {
+    var pick = gameState.currentPick;
+    if (!pick) return;
+    var p = pick.player;
+    // Store pick details into the matching slot (replaces existing)
+    gameState.slots[p.pos] = {
+      name: p.name,
+      pos: p.pos,
+      rating: p.rating,
+      year: pick.year,
+      team: pick.team
+    };
+    // Clear current pick after drafting
+    gameState.currentPick = null;
+    renderSlots();
+    renderCurrentPick();
   }
 
   function doRoll() {
     rollBtn.classList.add("rolling");
     setTimeout(function () { rollBtn.classList.remove("rolling"); }, 500);
-    gameState.year = 1980 + Math.floor(Math.random() * 45); // 1980-2024
-    gameState.team = NBA_TEAMS_GAME[Math.floor(Math.random() * NBA_TEAMS_GAME.length)];
-    gameState.roster = rollRoster();
-    // clear slots on new roll
-    gameState.slots = { PG: null, SG: null, SF: null, PF: null, C: null };
+    var pick = rollSinglePick();
+    gameState.currentPick = pick;
     gameState.rolls++;
     rollsCountEl.textContent = gameState.rolls;
-    rollYearEl.textContent = gameState.year;
-    rollTeamEl.textContent = gameState.team;
+    rollYearEl.textContent = pick.year;
+    rollTeamEl.textContent = pick.team;
     gameResultEl.classList.add("hidden");
-    renderSlots();
-    renderRoster();
+    renderCurrentPick();
   }
 
   // AI prediction: map avg rating -> wins, with variance. 82-0 only at near-perfect ratings.
@@ -4730,9 +4880,10 @@ try {
 
   function resetGame() {
     gameState.slots = { PG: null, SG: null, SF: null, PF: null, C: null };
+    gameState.currentPick = null;
     gameResultEl.classList.add("hidden");
     renderSlots();
-    renderRoster();
+    renderCurrentPick();
   }
 
   if (rollBtn) rollBtn.addEventListener("click", doRoll);
