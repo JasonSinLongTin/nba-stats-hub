@@ -1463,6 +1463,616 @@
     padding: 0 6px;
   }
 
+  /* Favorite (star) button on player cards */
+  .pc-fav-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(10,14,39,0.55);
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 3;
+    opacity: 0.75;
+  }
+  .player-card:hover .pc-fav-btn { opacity: 1; }
+  .pc-fav-btn:hover { transform: scale(1.1); border-color: var(--nba-gold); color: var(--nba-gold); }
+  .pc-fav-btn.active {
+    background: rgba(253,185,39,0.15);
+    color: var(--nba-gold);
+    border-color: var(--nba-gold);
+    box-shadow: 0 0 10px rgba(253,185,39,0.35);
+    opacity: 1;
+  }
+
+  /* ---------- Theme switcher ---------- */
+  .theme-switcher {
+    display: inline-flex;
+    gap: 5px;
+    padding: 4px 7px;
+    margin-right: 8px;
+    background: rgba(10,14,39,0.55);
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 999px;
+  }
+  .theme-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 0;
+    padding: 0;
+    line-height: 0;
+    transition: all 0.2s;
+  }
+  .theme-dot:hover { transform: scale(1.12); }
+  .theme-dot.theme-dark { background: linear-gradient(135deg,#0a0e27,#17408b); }
+  .theme-dot.theme-light { background: linear-gradient(135deg,#fafafa,#ffdf9b); }
+  .theme-dot.theme-classic { background: linear-gradient(135deg,#f67e2d,#c9082a); }
+  .theme-dot.active { border-color: var(--nba-gold); box-shadow: 0 0 0 2px rgba(253,185,39,0.25); }
+
+  /* Theme: Light Arena */
+  body[data-theme="light"] {
+    color: #162033;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(253,185,39,0.18), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(23,64,139,0.10), transparent 45%),
+      linear-gradient(135deg, #fafaf7 0%, #f5efe0 55%, #fdf6e3 100%);
+  }
+  body[data-theme="light"] .court-overlay { opacity: 0.05; }
+  body[data-theme="light"] .topbar,
+  body[data-theme="light"] #auth-screen,
+  body[data-theme="light"] .modal-inner,
+  body[data-theme="light"] .controls,
+  body[data-theme="light"] .status-bar,
+  body[data-theme="light"] .compare-queue,
+  body[data-theme="light"] .player-card,
+  body[data-theme="light"] .leader-card,
+  body[data-theme="light"] .standings-row,
+  body[data-theme="light"] .transfer-panel,
+  body[data-theme="light"] .stat-range-wrap,
+  body[data-theme="light"] .search-box,
+  body[data-theme="light"] .select-wrap select,
+  body[data-theme="light"] textarea,
+  body[data-theme="light"] input[type="text"],
+  body[data-theme="light"] input[type="password"],
+  body[data-theme="light"] input[type="number"],
+  body[data-theme="light"] .fav-team-select {
+    background: #fff;
+    color: #162033;
+    border-color: rgba(22,32,51,0.12);
+  }
+  body[data-theme="light"] .pc-name,
+  body[data-theme="light"] .welcome,
+  body[data-theme="light"] h1,
+  body[data-theme="light"] h2,
+  body[data-theme="light"] h3,
+  body[data-theme="light"] h4 { color: #162033; }
+  body[data-theme="light"] .player-card::after { background: linear-gradient(135deg, rgba(23,64,139,0.08), rgba(201,8,42,0.08)); }
+  body[data-theme="light"] .pc-team,
+  body[data-theme="light"] .pc-pos,
+  body[data-theme="light"] .pc-num,
+  body[data-theme="light"] .sl { color: rgba(22,32,51,0.62); }
+  body[data-theme="light"] .sv,
+  body[data-theme="light"] .leader-card .value { color: var(--nba-red); }
+  body[data-theme="light"] .hero-banner p { color: rgba(22,32,51,0.78); }
+  body[data-theme="light"] .advanced-toggle { color: rgba(22,32,51,0.55); }
+  body[data-theme="light"] .toggle-text,
+  body[data-theme="light"] .subtitle { color: rgba(22,32,51,0.68); }
+  body[data-theme="light"] .logout-btn { background: rgba(201,8,42,0.08); color: var(--nba-red); border: 1px solid rgba(201,8,42,0.3); }
+  body[data-theme="light"] .scouting-notes textarea { background: #fffdf6; color: #162033; }
+
+  /* Theme: Classic Orange */
+  body[data-theme="classic"] {
+    color: #fff;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(253,185,39,0.25), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(201,8,42,0.25), transparent 45%),
+      linear-gradient(135deg, #3a120b 0%, #6a2c10 40%, #c44a15 85%);
+  }
+  body[data-theme="classic"] .player-card::after { background: linear-gradient(135deg, rgba(246,126,45,0.12), rgba(253,185,39,0.10)); }
+  body[data-theme="classic"] .topbar,
+  body[data-theme="classic"] #auth-screen,
+  body[data-theme="classic"] .modal-inner,
+  body[data-theme="classic"] .controls,
+  body[data-theme="classic"] .status-bar,
+  body[data-theme="classic"] .compare-queue,
+  body[data-theme="classic"] .player-card,
+  body[data-theme="classic"] .leader-card {
+    background: rgba(40,12,6,0.72);
+    border-color: rgba(253,185,39,0.22);
+  }
+  body[data-theme="classic"] .search-box,
+  body[data-theme="classic"] .select-wrap select,
+  body[data-theme="classic"] input,
+  body[data-theme="classic"] textarea,
+  body[data-theme="classic"] .stat-range-wrap,
+  body[data-theme="classic"] .fav-team-select {
+    background: rgba(40,12,6,0.88);
+    color: #fff;
+    border-color: rgba(253,185,39,0.3);
+  }
+
+  /* ---------- Favorites section ---------- */
+  .section-head.with-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .favorites-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+  .fav-team-select {
+    background: rgba(10,14,39,0.6);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .fav-team-select:focus { outline: none; border-color: var(--nba-gold); }
+  .favorites-empty {
+    padding: 14px 18px;
+    border: 1px dashed rgba(255,255,255,0.18);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+  }
+
+  /* ---------- Chip-style controls buttons ---------- */
+  .controls-chip-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(10,14,39,0.6);
+    color: rgba(255,255,255,0.9);
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .controls-chip-btn:hover { border-color: var(--nba-gold); color: var(--nba-gold); background: rgba(253,185,39,0.08); }
+  .fav-only-btn.active {
+    background: rgba(253,185,39,0.18);
+    color: var(--nba-gold);
+    border-color: var(--nba-gold);
+    box-shadow: 0 0 8px rgba(253,185,39,0.25);
+  }
+  .csv-btn:hover { border-color: #8ddb5b; color: #8ddb5b; background: rgba(141,219,91,0.08); }
+
+  /* ---------- Scouting notes (inside player modal) ---------- */
+  .scouting-notes {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .scouting-notes .notes-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .scouting-notes h4 {
+    font-size: 14px;
+    color: var(--nba-gold);
+    letter-spacing: 0.02em;
+  }
+  .scouting-notes .notes-status {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+  }
+  .scouting-notes textarea {
+    width: 100%;
+    min-height: 96px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    resize: vertical;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .scouting-notes textarea:focus {
+    outline: none;
+    border-color: var(--nba-gold);
+    background: rgba(253,185,39,0.05);
+  }
+  .scouting-notes textarea::placeholder { color: rgba(255,255,255,0.35); }
+
+  /* ---------- Left navigation sidebar ---------- */
+  .side-nav {
+    position: fixed;
+    top: 0; left: 0;
+    width: 230px;
+    height: 100vh;
+    background: linear-gradient(180deg, rgba(10,14,39,0.97), rgba(23,64,139,0.94));
+    border-right: 1px solid rgba(253,185,39,0.22);
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    z-index: 90;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.35);
+  }
+  .side-nav.open { transform: translateX(0); }
+  .side-nav-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 10px;
+  }
+  .side-nav-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: var(--nba-gold);
+    text-transform: uppercase;
+  }
+  .side-nav-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+  }
+  .side-nav-close:hover { color: #fff; }
+  .side-nav-list { list-style: none; padding: 0; margin: 0; }
+  .side-nav-list li { margin-bottom: 4px; }
+  .side-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    color: rgba(255,255,255,0.82);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.18s;
+    border: 1px solid transparent;
+  }
+  .side-nav-link:hover {
+    background: rgba(253,185,39,0.12);
+    color: var(--nba-gold);
+    border-color: rgba(253,185,39,0.25);
+    transform: translateX(2px);
+  }
+  .side-nav-link.active {
+    background: rgba(253,185,39,0.18);
+    color: var(--nba-gold);
+    border-color: var(--nba-gold);
+    box-shadow: 0 0 12px rgba(253,185,39,0.2);
+  }
+  .nav-ico { font-size: 18px; line-height: 1; }
+  .side-nav-foot {
+    margin-top: auto;
+    padding: 12px 8px 4px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .side-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    z-index: 89;
+  }
+  .side-nav-backdrop.open { opacity: 1; pointer-events: auto; }
+  .sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    margin-bottom: 14px;
+    background: rgba(23,64,139,0.7);
+    border: 1px solid rgba(253,185,39,0.35);
+    color: var(--nba-gold);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sidebar-toggle:hover { background: rgba(253,185,39,0.15); border-color: var(--nba-gold); }
+
+  /* ---------- Roster Roll mini-game ---------- */
+  .game-section {
+    margin-top: 36px;
+    padding: 22px;
+    background: linear-gradient(160deg, rgba(10,14,39,0.7), rgba(23,64,139,0.45));
+    border: 1px solid rgba(253,185,39,0.25);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+  }
+  .game-intro {
+    color: rgba(255,255,255,0.72);
+    font-size: 14px;
+    margin-bottom: 18px;
+    line-height: 1.55;
+  }
+  .game-intro .perfect { color: var(--nba-gold); font-size: 16px; }
+  .game-board {
+    display: grid;
+    gap: 18px;
+  }
+  .game-stage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+    padding: 16px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .roll-btn {
+    padding: 14px 26px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #0a0e27;
+    background: linear-gradient(135deg, var(--nba-gold), #f6a609);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(253,185,39,0.4);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .roll-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(253,185,39,0.55); }
+  .roll-btn:active { transform: translateY(0); }
+  .roll-btn.rolling { animation: rollShake 0.5s ease; }
+  @keyframes rollShake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-3px) rotate(-2deg); }
+    75% { transform: translateX(3px) rotate(2deg); }
+  }
+  .roll-display { flex: 1; min-width: 200px; }
+  .roll-year {
+    font-size: 34px;
+    font-weight: 900;
+    color: var(--nba-gold);
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .roll-team {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 4px;
+  }
+  .roll-hint { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 6px; flex-basis: 100%; }
+
+  .game-slots {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .slot {
+    padding: 14px 8px;
+    background: rgba(0,0,0,0.3);
+    border: 2px dashed rgba(255,255,255,0.18);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.22s;
+    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+  }
+  .slot.filled {
+    border-style: solid;
+    border-color: rgba(253,185,39,0.5);
+    background: rgba(253,185,39,0.08);
+    box-shadow: 0 0 14px rgba(253,185,39,0.18);
+  }
+  .slot.elite {
+    border-color: #8ddb5b;
+    background: rgba(141,219,91,0.1);
+    box-shadow: 0 0 16px rgba(141,219,91,0.3);
+  }
+  .slot-pos {
+    font-size: 12px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.1em;
+  }
+  .slot.filled .slot-pos { color: var(--nba-gold); }
+  .slot.elite .slot-pos { color: #8ddb5b; }
+  .slot-name { font-size: 13px; font-weight: 700; color: #fff; }
+  .slot-rating { font-size: 22px; font-weight: 900; color: var(--nba-gold); line-height: 1; }
+  .slot.elite .slot-rating { color: #8ddb5b; }
+  .slot-empty-mark { font-size: 20px; color: rgba(255,255,255,0.25); }
+
+  .game-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .predict-btn {
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0a0e27;
+    background: linear-gradient(135deg, #8ddb5b, #4caf50);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(141,219,91,0.35);
+    transition: all 0.2s;
+  }
+  .predict-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(141,219,91,0.5); }
+  .predict-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .reset-game-btn {
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .reset-game-btn:hover { background: rgba(201,8,42,0.15); border-color: var(--nba-red); color: var(--nba-red); }
+  .rolls-count, .best-record {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    margin-left: auto;
+  }
+  .rolls-count b, .best-record b { color: var(--nba-gold); font-size: 14px; }
+
+  .game-result {
+    padding: 22px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    text-align: center;
+    animation: resultPop 0.5s ease;
+  }
+  @keyframes resultPop {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .result-head { font-size: 12px; letter-spacing: 0.18em; color: rgba(255,255,255,0.55); text-transform: uppercase; margin-bottom: 8px; }
+  .record-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .record-wins { font-size: 56px; font-weight: 900; color: #8ddb5b; line-height: 1; }
+  .record-losses { font-size: 56px; font-weight: 900; color: var(--nba-red); line-height: 1; }
+  .record-dash { font-size: 40px; font-weight: 300; color: rgba(255,255,255,0.4); }
+  .result-verdict { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 14px; }
+  .result-verdict.win { color: var(--nba-gold); font-size: 18px; text-shadow: 0 0 12px rgba(253,185,39,0.5); }
+  .result-bar-wrap {
+    position: relative;
+    height: 12px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0 auto 6px;
+    max-width: 460px;
+  }
+  .result-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--nba-red) 0%, var(--nba-gold) 50%, #8ddb5b 100%);
+    border-radius: 6px;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .result-bar-marker {
+    position: absolute;
+    top: -3px;
+    width: 2px;
+    height: 18px;
+    background: #8ddb5b;
+    box-shadow: 0 0 6px #8ddb5b;
+  }
+  .result-scale {
+    display: flex;
+    justify-content: space-between;
+    max-width: 460px;
+    margin: 0 auto;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .roster-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    min-height: 80px;
+  }
+  .roster-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 24px;
+    color: rgba(255,255,255,0.4);
+    font-size: 13px;
+    border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 10px;
+  }
+  .roster-card {
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+    position: relative;
+  }
+  .roster-card:hover { border-color: var(--nba-gold); background: rgba(253,185,39,0.1); transform: translateY(-2px); }
+  .roster-card.taken { opacity: 0.32; cursor: not-allowed; pointer-events: none; }
+  .roster-card.taken::after { content: "\2713 Drafted"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #8ddb5b; font-size: 12px; font-weight: 800; }
+  .rc-name { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+  .rc-pos { font-size: 10px; color: rgba(255,255,255,0.55); letter-spacing: 0.08em; }
+  .rc-rating {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--nba-gold);
+    line-height: 1;
+    margin-top: 4px;
+  }
+  .roster-card.elite .rc-rating { color: #8ddb5b; }
+  .rc-tier {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+  .tier-role { color: rgba(255,255,255,0.45); }
+  .tier-starter { color: #6db8ff; }
+  .tier-star { color: var(--nba-gold); }
+  .tier-super { color: #ff6ec7; }
+  .tier-legend { color: #8ddb5b; }
+
+  body[data-theme="light"] .side-nav { background: linear-gradient(180deg, #fff, #f5efe0); border-color: rgba(201,8,42,0.2); }
+  body[data-theme="light"] .side-nav-link { color: #162033; }
+  body[data-theme="light"] .side-nav-link:hover { background: rgba(253,185,39,0.15); }
+  body[data-theme="light"] .side-nav-close { color: rgba(22,32,51,0.6); }
+  body[data-theme="light"] .game-section { background: linear-gradient(160deg, #fff, #faf6ec); }
+  body[data-theme="light"] .game-stage,
+  body[data-theme="light"] .game-result { background: rgba(22,32,51,0.04); border-color: rgba(22,32,51,0.1); }
+  body[data-theme="light"] .slot { background: rgba(22,32,51,0.04); border-color: rgba(22,32,51,0.18); }
+  body[data-theme="light"] .roster-card { background: #fff; border-color: rgba(22,32,51,0.12); }
+  body[data-theme="light"] .sidebar-toggle { background: rgba(23,64,139,0.1); }
+  body[data-theme="light"] .reset-game-btn { background: rgba(22,32,51,0.04); color: #162033; }
+
+  @media (max-width: 900px) {
+    .game-slots { grid-template-columns: repeat(3, 1fr); }
+    .roster-area { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  }
+
   @media (max-width: 600px) {
     .compare-selectors { grid-template-columns: 1fr; }
     .compare-vs { padding: 4px 0; }
@@ -1835,23 +2445,46 @@ try {
   <div class="topbar">
     <div class="brand"><span class="brand-ball"></span><span class="nba-text">NBA</span> Hub</div>
     <div class="user-area">
+      <div class="theme-switcher" id="theme-switcher" title="Change appearance theme">
+        <button class="theme-dot theme-dark active" data-theme="dark" aria-label="Dark Court theme" title="Dark Court">&#9679;</button>
+        <button class="theme-dot theme-light" data-theme="light" aria-label="Light Arena theme" title="Light Arena">&#9679;</button>
+        <button class="theme-dot theme-classic" data-theme="classic" aria-label="Classic Orange theme" title="Classic Orange">&#9679;</button>
+      </div>
       <button class="logout-btn" id="export-btn" title="Backup: export a manual account code (optional — in Cloud mode, just log in with your username/password on any device)" style="background:rgba(253,185,39,0.12);color:var(--nba-gold);border:1px solid rgba(253,185,39,0.35);margin-right:8px;font-size:0.78rem;">&#8634; Backup</button>
       <span class="welcome">Hi, <b id="current-user"></b></span>
       <button class="logout-btn" id="logout-btn">Log Out</button>
     </div>
   </div>
+
+  <!-- Left navigation sidebar -->
+  <nav class="side-nav" id="side-nav">
+    <div class="side-nav-head">
+      <span class="side-nav-title">Menu</span>
+      <button class="side-nav-close" id="side-nav-close" aria-label="Close menu">&times;</button>
+    </div>
+    <ul class="side-nav-list">
+      <li><a href="#section-leaders" class="side-nav-link" data-target="section-leaders"><span class="nav-ico">&#127941;</span> Stat Leaders</a></li>
+      <li><a href="#section-standings" class="side-nav-link" data-target="section-standings"><span class="nav-ico">&#128202;</span> Power Rankings</a></li>
+      <li><a href="#section-favorites" class="side-nav-link" data-target="section-favorites"><span class="nav-ico">&#11088;</span> Your Favorites</a></li>
+      <li><a href="#section-players" class="side-nav-link" data-target="section-players"><span class="nav-ico">&#127936;</span> NBA Players</a></li>
+      <li><a href="#section-game" class="side-nav-link" data-target="section-game"><span class="nav-ico">&#127922;</span> Roster Roll Game</a></li>
+    </ul>
+    <div class="side-nav-foot">Tap any link to jump to that section.</div>
+  </nav>
+  <div class="side-nav-backdrop" id="side-nav-backdrop"></div>
   <div class="hero-banner">
     <div class="live-pill">Live Stats</div>
     <h1>Where <span class="glow">Legends</span> Live</h1>
     <p>Real-time NBA player stats, team rosters, and season leaders — all in one arena.</p>
   </div>
   <div class="content">
+    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation menu">&#9776;</button>
     <!-- Stat leaders -->
-    <h2>Stat Leaders</h2>
+    <h2 id="section-leaders">Stat Leaders</h2>
     <div class="leaders-row" id="leaders-row"></div>
 
     <!-- Standings / Power Rankings -->
-    <div class="standings-section">
+    <div class="standings-section" id="section-standings">
       <div class="section-head">
         <h2>Team Power Rankings</h2>
         <div class="standings-tabs">
@@ -1865,8 +2498,21 @@ try {
       <p class="standings-note">Rankings derived from aggregate team scoring and efficiency of rostered players. Stats update with live data.</p>
     </div>
 
+    <!-- Your Favorites section -->
+    <div class="section-head with-actions" id="section-favorites" style="margin-top:18px;">
+      <h2 style="margin:0;">&#11088; Your Favorites</h2>
+      <div class="fav-team-wrap">
+        <label for="fav-team-select" style="font-size:12px;color:rgba(255,255,255,0.7);margin-right:6px;">My Team:</label>
+        <select id="fav-team-select" class="fav-team-select">
+          <option value="">— None —</option>
+        </select>
+      </div>
+    </div>
+    <div id="favorites-empty" class="empty-state" style="margin-bottom:16px;">No favorites yet. Click the &#11088; star on any player card to bookmark them, and pick a favorite team above.</div>
+    <div class="player-grid favorites-grid" id="favorites-grid" style="display:none;"></div>
+
     <!-- Players section -->
-    <h2>NBA Players</h2>
+    <h2 id="section-players" style="margin-top:26px;">NBA Players</h2>
     <div class="controls">
       <div class="search-box">
         <span class="icon">&#128269;</span>
@@ -1916,6 +2562,12 @@ try {
         <input type="number" id="stat-range-min" placeholder="0" min="0" step="0.1" style="width:64px;">
         <button class="clear-range" id="clear-range-btn" title="Clear stat filter">&times;</button>
       </div>
+      <button class="controls-chip-btn fav-only-btn" id="fav-only-btn" title="Toggle view to show only your favorite players" aria-pressed="false">
+        &#11088; <span class="fav-chip-label">Favorites</span>
+      </button>
+      <button class="controls-chip-btn csv-btn" id="csv-export-btn" title="Download the currently filtered player list as a CSV spreadsheet">
+        &#128196; CSV
+      </button>
       <button class="compare-trigger" id="compare-trigger-btn">
         &#9878; Compare Players <span class="compare-count" id="compare-count" style="display:none;">0</span>
       </button>
@@ -1945,6 +2597,77 @@ try {
     </div>
 
     <div class="player-grid" id="player-grid"></div>
+
+    <!-- ============ ROSTER ROLL MINI-GAME ============ -->
+    <section id="section-game" class="game-section">
+      <h2 style="margin-top:32px;">&#127922; Roster Roll</h2>
+      <p class="game-intro">Roll a random <b>year</b> + <b>team</b>, draft one player into each of the 5 position slots (PG, SG, SF, PF, C), then let the AI predict your season record. Go <b class="perfect">82-0</b> to win!</p>
+
+      <div class="game-board">
+        <div class="game-stage">
+          <button class="roll-btn" id="roll-btn">&#127922; Roll Year + Team</button>
+          <div class="roll-display" id="roll-display">
+            <div class="roll-year" id="roll-year">—</div>
+            <div class="roll-team" id="roll-team">Press "Roll" to begin</div>
+          </div>
+          <div class="roll-hint" id="roll-hint">Each roll generates a fresh roster with random player ratings (40-99). Draft the best 5 to chase a perfect season.</div>
+        </div>
+
+        <div class="game-slots" id="game-slots">
+          <div class="slot" data-pos="PG">
+            <div class="slot-pos">PG</div>
+            <div class="slot-name">Empty</div>
+            <div class="slot-rating">—</div>
+          </div>
+          <div class="slot" data-pos="SG">
+            <div class="slot-pos">SG</div>
+            <div class="slot-name">Empty</div>
+            <div class="slot-rating">—</div>
+          </div>
+          <div class="slot" data-pos="SF">
+            <div class="slot-pos">SF</div>
+            <div class="slot-name">Empty</div>
+            <div class="slot-rating">—</div>
+          </div>
+          <div class="slot" data-pos="PF">
+            <div class="slot-pos">PF</div>
+            <div class="slot-name">Empty</div>
+            <div class="slot-rating">—</div>
+          </div>
+          <div class="slot" data-pos="C">
+            <div class="slot-pos">C</div>
+            <div class="slot-name">Empty</div>
+            <div class="slot-rating">—</div>
+          </div>
+        </div>
+
+        <div class="game-actions">
+          <button class="predict-btn" id="predict-btn" disabled>&#129302; Predict Season</button>
+          <button class="reset-game-btn" id="reset-game-btn">&#8634; Reset</button>
+          <span class="rolls-count">Rolls: <b id="rolls-count">0</b></span>
+          <span class="best-record">Best: <b id="best-record">—</b></span>
+        </div>
+
+        <div class="game-result hidden" id="game-result">
+          <div class="result-head" id="result-head">AI Prediction</div>
+          <div class="record-display" id="record-display">
+            <span class="record-wins" id="record-wins">0</span>
+            <span class="record-dash">-</span>
+            <span class="record-losses" id="record-losses">0</span>
+          </div>
+          <div class="result-verdict" id="result-verdict"></div>
+          <div class="result-bar-wrap">
+            <div class="result-bar" id="result-bar"></div>
+            <div class="result-bar-marker" style="left:100%;"></div>
+          </div>
+          <div class="result-scale"><span>0W</span><span>41W (.500)</span><span>82W (perfect)</span></div>
+        </div>
+
+        <div class="roster-area" id="roster-area">
+          <div class="roster-empty">Roll a year + team to reveal your roster.</div>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -3722,6 +4445,299 @@ try {
   queueStartBtn.addEventListener("click", function () {
     if (compareSlots[0] && compareSlots[1]) openCompare();
   });
+
+  // ====================================================================
+  // LEFT SIDEBAR NAVIGATION
+  // ====================================================================
+  var sideNav = document.getElementById("side-nav");
+  var sideNavBackdrop = document.getElementById("side-nav-backdrop");
+  var sidebarToggle = document.getElementById("sidebar-toggle");
+  var sideNavClose = document.getElementById("side-nav-close");
+  var sideNavLinks = document.querySelectorAll(".side-nav-link");
+
+  function openSideNav() {
+    sideNav.classList.add("open");
+    sideNavBackdrop.classList.add("open");
+  }
+  function closeSideNav() {
+    sideNav.classList.remove("open");
+    sideNavBackdrop.classList.remove("open");
+  }
+  if (sidebarToggle) sidebarToggle.addEventListener("click", openSideNav);
+  if (sideNavClose) sideNavClose.addEventListener("click", closeSideNav);
+  if (sideNavBackdrop) sideNavBackdrop.addEventListener("click", closeSideNav);
+
+  sideNavLinks.forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      var targetId = link.getAttribute("data-target");
+      var target = targetId ? document.getElementById(targetId) : null;
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        // brief highlight
+        target.style.transition = "background 0.4s";
+        target.style.background = "rgba(253,185,39,0.12)";
+        setTimeout(function () { target.style.background = ""; }, 900);
+      }
+      closeSideNav();
+      // active state
+      sideNavLinks.forEach(function (l) { l.classList.remove("active"); });
+      link.classList.add("active");
+    });
+  });
+
+  // Highlight nav link as user scrolls
+  var sectionIds = ["section-leaders", "section-standings", "section-favorites", "section-players", "section-game"];
+  function updateActiveNav() {
+    var scrollY = window.scrollY + 140;
+    var current = sectionIds[0];
+    sectionIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.offsetTop <= scrollY) current = id;
+    });
+    sideNavLinks.forEach(function (l) {
+      l.classList.toggle("active", l.getAttribute("data-target") === current);
+    });
+  }
+  window.addEventListener("scroll", updateActiveNav, { passive: true });
+
+  // ====================================================================
+  // ROSTER ROLL MINI-GAME
+  // ====================================================================
+  var NBA_TEAMS_GAME = [
+    "Atlanta Hawks","Boston Celtics","Brooklyn Nets","Charlotte Hornets",
+    "Chicago Bulls","Cleveland Cavaliers","Dallas Mavericks","Denver Nuggets",
+    "Detroit Pistons","Golden State Warriors","Houston Rockets","Indiana Pacers",
+    "LA Clippers","Los Angeles Lakers","Memphis Grizzlies","Miami Heat",
+    "Milwaukee Bucks","Minnesota Timberwolves","New Orleans Pelicans",
+    "New York Knicks","Oklahoma City Thunder","Orlando Magic","Philadelphia 76ers",
+    "Phoenix Suns","Portland Trail Blazers","Sacramento Kings","San Antonio Spurs",
+    "Toronto Raptors","Utah Jazz","Washington Wizards"
+  ];
+  var FIRST_NAMES = [
+    "Marcus","Devin","Tyrell","Jamal","Kawhi","DeMar","Trae","Donovan","Ja","Zion",
+    "Anthony","LeBron","Stephen","Kevin","Giannis","Luka","Nikola","Joel","Jayson",
+    "Damian","Bradley","De'Aaron","LaMelo","Cade","Paolo","Scottie","Evan","Tyrese",
+    "Desmond","Jaren","Scott","Anfernee","Jalen","Immanuel","Dejounte","Bam","Pascal",
+    "Tyus","Malik","Buddy","Jordan","Kyle","Mikal","Miles","Caleb","Cam","Ochai"
+  ];
+  var LAST_NAMES = [
+    "Smith","Brown","Williams","Johnson","Davis","Jackson","Green","Harris","Martin",
+    "Thompson","Robinson","Clark","Lewis","Walker","Hall","Allen","Young","King",
+    "Wright","Lopez","Hill","Scott","Adams","Bennett","Cole","Russell","Hayes","Carter",
+    "Mitchell","Edwards","Bridges","Mobley","Haliburton","Murray","Adebayo","Siakam",
+    "Jones","Monk","Hield","Poole","Trent","Anderson","Watson","Foster","Reed","Bailey"
+  ];
+  var POSITIONS_GAME = ["PG","SG","SF","PF","C"];
+
+  // Weighted random rating: role players common, legends rare
+  function rollRating() {
+    var r = Math.random();
+    if (r < 0.40) return 40 + Math.floor(Math.random() * 21);      // 40-60  Role Player
+    if (r < 0.70) return 61 + Math.floor(Math.random() * 15);      // 61-75  Starter
+    if (r < 0.90) return 76 + Math.floor(Math.random() * 10);      // 76-85  All-Star
+    if (r < 0.98) return 86 + Math.floor(Math.random() * 8);       // 86-93  Superstar
+    return 94 + Math.floor(Math.random() * 6);                    // 94-99  Legend
+  }
+
+  function ratingTier(r) {
+    if (r >= 94) return { name: "Legend", cls: "tier-legend", elite: true };
+    if (r >= 86) return { name: "Superstar", cls: "tier-super", elite: false };
+    if (r >= 76) return { name: "All-Star", cls: "tier-star", elite: false };
+    if (r >= 61) return { name: "Starter", cls: "tier-starter", elite: false };
+    return { name: "Role", cls: "tier-role", elite: false };
+  }
+
+  function rollPlayer(pos) {
+    var first = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+    var last = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+    var rating = rollRating();
+    return { name: first + " " + last, pos: pos, rating: rating };
+  }
+
+  function rollRoster() {
+    // 12 players, ensure at least 1 per position, rest random
+    var roster = [];
+    var usedNames = {};
+    POSITIONS_GAME.forEach(function (p) {
+      var pl;
+      do { pl = rollPlayer(p); } while (usedNames[pl.name]);
+      usedNames[pl.name] = 1;
+      roster.push(pl);
+    });
+    // add 7 more random-position players
+    for (var i = 0; i < 7; i++) {
+      var p = POSITIONS_GAME[Math.floor(Math.random() * POSITIONS_GAME.length)];
+      var pl;
+      do { pl = rollPlayer(p); } while (usedNames[pl.name]);
+      usedNames[pl.name] = 1;
+      roster.push(pl);
+    }
+    // sort by rating desc for nice display
+    roster.sort(function (a, b) { return b.rating - a.rating; });
+    return roster;
+  }
+
+  // --- Game state ---
+  var gameState = {
+    year: null,
+    team: null,
+    roster: [],
+    slots: { PG: null, SG: null, SF: null, PF: null, C: null },
+    rolls: 0,
+    bestWins: -1
+  };
+
+  var rollBtn = document.getElementById("roll-btn");
+  var rollYearEl = document.getElementById("roll-year");
+  var rollTeamEl = document.getElementById("roll-team");
+  var gameSlotsEl = document.getElementById("game-slots");
+  var predictBtn = document.getElementById("predict-btn");
+  var resetGameBtn = document.getElementById("reset-game-btn");
+  var rollsCountEl = document.getElementById("rolls-count");
+  var bestRecordEl = document.getElementById("best-record");
+  var gameResultEl = document.getElementById("game-result");
+  var recordWinsEl = document.getElementById("record-wins");
+  var recordLossesEl = document.getElementById("record-losses");
+  var resultVerdictEl = document.getElementById("result-verdict");
+  var resultBarEl = document.getElementById("result-bar");
+  var rosterAreaEl = document.getElementById("roster-area");
+
+  function renderSlots() {
+    var slots = gameSlotsEl.querySelectorAll(".slot");
+    slots.forEach(function (slotEl) {
+      var pos = slotEl.getAttribute("data-pos");
+      var p = gameState.slots[pos];
+      if (p) {
+        var tier = ratingTier(p.rating);
+        slotEl.classList.add("filled");
+        slotEl.classList.toggle("elite", tier.elite);
+        slotEl.innerHTML =
+          '<div class="slot-pos">' + pos + '</div>' +
+          '<div class="slot-name">' + p.name + '</div>' +
+          '<div class="slot-rating">' + p.rating + '</div>';
+      } else {
+        slotEl.classList.remove("filled", "elite");
+        slotEl.innerHTML =
+          '<div class="slot-pos">' + pos + '</div>' +
+          '<div class="slot-empty-mark">&mdash;</div>' +
+          '<div class="slot-name" style="opacity:0.4;font-size:11px;">Empty</div>';
+      }
+    });
+    var allFilled = POSITIONS_GAME.every(function (p) { return gameState.slots[p]; });
+    predictBtn.disabled = !allFilled;
+  }
+
+  function renderRoster() {
+    if (!gameState.roster.length) {
+      rosterAreaEl.innerHTML = '<div class="roster-empty">Roll a year + team to reveal your roster.</div>';
+      return;
+    }
+    var html = "";
+    gameState.roster.forEach(function (p, idx) {
+      var tier = ratingTier(p.rating);
+      var taken = gameState.slots[p.pos] && gameState.slots[p.pos].name === p.name && gameState.slots[p.pos].rating === p.rating;
+      html +=
+        '<div class="roster-card ' + (tier.elite ? "elite" : "") + (taken ? " taken" : "") + '" data-idx="' + idx + '">' +
+          '<div class="rc-name">' + p.name + '</div>' +
+          '<div class="rc-pos">' + p.pos + '</div>' +
+          '<div class="rc-rating">' + p.rating + '</div>' +
+          '<div class="rc-tier ' + tier.cls + '">' + tier.name + '</div>' +
+        '</div>';
+    });
+    rosterAreaEl.innerHTML = html;
+    // bind clicks
+    rosterAreaEl.querySelectorAll(".roster-card").forEach(function (card) {
+      card.addEventListener("click", function () {
+        if (card.classList.contains("taken")) return;
+        var idx = parseInt(card.getAttribute("data-idx"), 10);
+        var p = gameState.roster[idx];
+        // fill the matching position slot (replaces any existing)
+        gameState.slots[p.pos] = p;
+        renderSlots();
+        renderRoster();
+      });
+    });
+  }
+
+  function doRoll() {
+    rollBtn.classList.add("rolling");
+    setTimeout(function () { rollBtn.classList.remove("rolling"); }, 500);
+    gameState.year = 1980 + Math.floor(Math.random() * 45); // 1980-2024
+    gameState.team = NBA_TEAMS_GAME[Math.floor(Math.random() * NBA_TEAMS_GAME.length)];
+    gameState.roster = rollRoster();
+    // clear slots on new roll
+    gameState.slots = { PG: null, SG: null, SF: null, PF: null, C: null };
+    gameState.rolls++;
+    rollsCountEl.textContent = gameState.rolls;
+    rollYearEl.textContent = gameState.year;
+    rollTeamEl.textContent = gameState.team;
+    gameResultEl.classList.add("hidden");
+    renderSlots();
+    renderRoster();
+  }
+
+  // AI prediction: map avg rating -> wins, with variance. 82-0 only at near-perfect ratings.
+  function predictSeason() {
+    var starters = POSITIONS_GAME.map(function (p) { return gameState.slots[p]; });
+    var avg = starters.reduce(function (s, p) { return s + p.rating; }, 0) / 5;
+    // base wins: cubic-ish curve so high ratings accelerate
+    var base = Math.pow(Math.max(0, avg - 38) / 62, 2.3) * 82;
+    // variance: +/- up to 6 wins, but never below 0 or above 82
+    var variance = Math.floor((Math.random() - 0.4) * 12);
+    var wins = Math.round(base + variance);
+    if (wins < 0) wins = 0;
+    if (wins > 82) wins = 82;
+    var losses = 82 - wins;
+    return { wins: wins, losses: losses, avg: avg };
+  }
+
+  function showResult() {
+    var res = predictSeason();
+    gameResultEl.classList.remove("hidden");
+    recordWinsEl.textContent = res.wins;
+    recordLossesEl.textContent = res.losses;
+    // verdict
+    var verdict = "";
+    var isWin = (res.wins === 82 && res.losses === 0);
+    if (isWin) {
+      verdict = "&#127942; PERFECT SEASON! You assembled a legendary roster — 82-0!";
+    } else if (res.wins >= 70) {
+      verdict = "Dominant squad — championship contender!";
+    } else if (res.wins >= 55) {
+      verdict = "Strong playoff team. Solid core.";
+    } else if (res.wins >= 41) {
+      verdict = "Playoff bubble team. Could go either way.";
+    } else if (res.wins >= 25) {
+      verdict = "Rebuilding year. Lottery bound.";
+    } else {
+      verdict = "Tough season. Tank for draft picks.";
+    }
+    resultVerdictEl.innerHTML = verdict;
+    resultVerdictEl.classList.toggle("win", isWin);
+    // animate bar
+    var pct = (res.wins / 82) * 100;
+    resultBarEl.style.width = "0%";
+    setTimeout(function () { resultBarEl.style.width = pct + "%"; }, 80);
+    // best record
+    if (res.wins > gameState.bestWins) {
+      gameState.bestWins = res.wins;
+      bestRecordEl.textContent = res.wins + "-" + res.losses;
+    }
+    // scroll result into view
+    gameResultEl.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function resetGame() {
+    gameState.slots = { PG: null, SG: null, SF: null, PF: null, C: null };
+    gameResultEl.classList.add("hidden");
+    renderSlots();
+    renderRoster();
+  }
+
+  if (rollBtn) rollBtn.addEventListener("click", doRoll);
+  if (predictBtn) predictBtn.addEventListener("click", showResult);
+  if (resetGameBtn) resetGameBtn.addEventListener("click", resetGame);
 
   // ---------- Init ----------
   window.renderNBA = function () {
