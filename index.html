@@ -2253,6 +2253,201 @@
   body[data-theme="light"] .pick-badge { background: rgba(22,32,51,0.06); color: #162033; }
   body[data-theme="light"] .draft-btn { color: #162033; }
 
+  /* ---------- Prediction Center ---------- */
+  .predict-section {
+    margin-top: 36px;
+    padding: 22px;
+    background: linear-gradient(160deg, rgba(10,14,39,0.7), rgba(23,64,139,0.45));
+    border: 1px solid rgba(253,185,39,0.25);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+  }
+  .predict-intro {
+    color: rgba(255,255,255,0.72);
+    font-size: 14px;
+    margin-bottom: 18px;
+    line-height: 1.55;
+  }
+  .predict-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+  }
+  .predict-panel {
+    padding: 18px;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+  }
+  .panel-title {
+    margin: 0 0 14px;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--nba-gold);
+  }
+  .field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 5px;
+    letter-spacing: 0.05em;
+  }
+  .predict-select {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  .predict-select option { background: #0a0e27; color: #fff; }
+  .slider-row { margin: 10px 0 2px; }
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 4px;
+  }
+  .slider-label b { color: var(--nba-gold); }
+  .predict-slider {
+    width: 100%;
+    accent-color: var(--nba-gold);
+    cursor: pointer;
+  }
+  .season-result { margin-top: 16px; text-align: center; }
+  .season-note {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 10px;
+    min-height: 18px;
+  }
+  .vs-pickers {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .vs-pickers .predict-select { flex: 1; min-width: 0; margin-bottom: 0; }
+  .vs-badge {
+    flex-shrink: 0;
+    padding: 5px 10px;
+    background: rgba(253,185,39,0.15);
+    border: 1px solid rgba(253,185,39,0.4);
+    color: var(--nba-gold);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+  }
+  .vs-names {
+    display: flex;
+    justify-content: space-between;
+    margin: 12px 0 6px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .vs-bar-wrap {
+    position: relative;
+    height: 26px;
+    background: linear-gradient(90deg, rgba(201,8,42,0.5), rgba(201,8,42,0.25));
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .vs-bar {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: 50%;
+    background: linear-gradient(90deg, #1d9d4f, #8ddb5b);
+    border-radius: 8px 0 0 8px;
+    transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .vs-pct {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    padding: 0 8px;
+  }
+  .vs-pct.left { left: 0; }
+  .vs-pct.right { right: 0; }
+  .vs-h2h {
+    margin-top: 12px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    font-weight: 600;
+  }
+  .sim-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0a0e27;
+    background: linear-gradient(135deg, var(--nba-gold), #f6a609);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(253,185,39,0.35);
+    transition: all 0.2s;
+  }
+  .sim-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(253,185,39,0.5); }
+  .series-results {
+    margin-top: 14px;
+    padding: 14px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    text-align: center;
+    animation: resultPop 0.45s ease;
+  }
+  .series-winner {
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--nba-gold);
+    margin-bottom: 10px;
+  }
+  .series-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  .series-chip {
+    padding: 5px 10px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+  }
+  .series-chip.winner { border-color: var(--nba-gold); background: rgba(253,185,39,0.14); color: var(--nba-gold); }
+
+  body[data-theme="light"] .predict-section { background: linear-gradient(160deg, #fff, #faf6ec); }
+  body[data-theme="light"] .predict-panel { background: rgba(22,32,51,0.04); border-color: rgba(22,32,51,0.1); }
+  body[data-theme="light"] .predict-select { background: #fff; color: #162033; border-color: rgba(22,32,51,0.18); }
+  body[data-theme="light"] .predict-select option { background: #fff; color: #162033; }
+  body[data-theme="light"] .slider-label, body[data-theme="light"] .field-label { color: rgba(22,32,51,0.6); }
+  body[data-theme="light"] .season-note, body[data-theme="light"] .vs-h2h { color: rgba(22,32,51,0.7); }
+  body[data-theme="light"] .vs-names { color: #162033; }
+  body[data-theme="light"] .vs-bar-wrap { background: rgba(201,8,42,0.25); border-color: rgba(22,32,51,0.12); }
+  body[data-theme="light"] .series-results { background: rgba(22,32,51,0.04); border-color: rgba(22,32,51,0.1); }
+  body[data-theme="light"] .series-chip { background: rgba(22,32,51,0.05); color: #162033; border-color: rgba(22,32,51,0.12); }
+  body[data-theme="light"] .predict-intro { color: rgba(22,32,51,0.7); }
+
   body[data-theme="light"] .side-nav { background: linear-gradient(180deg, #fff, #f5efe0); border-color: rgba(201,8,42,0.2); }
   body[data-theme="light"] .side-nav-link { color: #162033; }
   body[data-theme="light"] .side-nav-link:hover { background: rgba(253,185,39,0.15); }
@@ -2665,6 +2860,7 @@ try {
       <li><a href="#section-favorites" class="side-nav-link" data-target="section-favorites"><span class="nav-ico">&#11088;</span> Your Favorites</a></li>
       <li><a href="#section-players" class="side-nav-link" data-target="section-players"><span class="nav-ico">&#127936;</span> NBA Players</a></li>
       <li><a href="#section-game" class="side-nav-link" data-target="section-game"><span class="nav-ico">&#127922;</span> Roster Roll Game</a></li>
+      <li><a href="#section-predict" class="side-nav-link" data-target="section-predict"><span class="nav-ico">&#128302;</span> Prediction Center</a></li>
     </ul>
     <div class="side-nav-foot">Tap any link to jump to that section.</div>
   </nav>
@@ -2862,6 +3058,64 @@ try {
             <div class="result-bar-marker" style="left:100%;"></div>
           </div>
           <div class="result-scale"><span>0W</span><span>41W (.500)</span><span>82W (perfect)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PREDICTION CENTER ============ -->
+    <section id="section-predict" class="predict-section">
+      <h2 style="margin-top:32px;">&#128302; Prediction Center</h2>
+      <p class="predict-intro">Forecasts are computed from live team power ratings (points, rebounds, assists, shooting efficiency). Boost a team with sliders, or pit two teams head-to-head!</p>
+
+      <div class="predict-grid">
+        <!-- Season Win Predictor -->
+        <div class="predict-panel">
+          <h3 class="panel-title">&#128200; Season Win Predictor</h3>
+          <label class="field-label">Choose a team</label>
+          <select id="season-team" class="predict-select"></select>
+          <div class="slider-row">
+            <label class="slider-label">Offense boost <b id="off-val">+0</b></label>
+            <input type="range" id="off-slider" class="predict-slider" min="-10" max="10" value="0" step="1">
+          </div>
+          <div class="slider-row">
+            <label class="slider-label">Defense boost <b id="def-val">+0</b></label>
+            <input type="range" id="def-slider" class="predict-slider" min="-10" max="10" value="0" step="1">
+          </div>
+          <div class="season-result" id="season-result">
+            <div class="record-display">
+              <span class="record-wins" id="season-wins">&mdash;</span>
+              <span class="record-dash">-</span>
+              <span class="record-losses" id="season-losses">&mdash;</span>
+            </div>
+            <div class="season-note" id="season-note">Pick a team to forecast its 82-game record</div>
+            <div class="result-bar-wrap"><div class="result-bar" id="season-bar"></div><div class="result-bar-marker" style="left:50%;"></div></div>
+            <div class="result-scale"><span>0W</span><span>41W (.500)</span><span>82W</span></div>
+          </div>
+        </div>
+
+        <!-- Team vs Team -->
+        <div class="predict-panel">
+          <h3 class="panel-title">&#9876;&#65039; Team vs Team</h3>
+          <div class="vs-pickers">
+            <select id="vs-team-a" class="predict-select"></select>
+            <span class="vs-badge">VS</span>
+            <select id="vs-team-b" class="predict-select"></select>
+          </div>
+          <div class="vs-names">
+            <span class="vs-name" id="vs-name-a">Team A</span>
+            <span class="vs-name" id="vs-name-b">Team B</span>
+          </div>
+          <div class="vs-bar-wrap">
+            <div class="vs-bar" id="vs-bar"></div>
+            <span class="vs-pct left" id="vs-pct-a">&mdash;</span>
+            <span class="vs-pct right" id="vs-pct-b">&mdash;</span>
+          </div>
+          <div class="vs-h2h" id="vs-h2h">Expected head-to-head: &mdash;</div>
+          <button class="sim-btn" id="sim-series-btn">&#127922; Simulate 7-Game Series &times;10,000</button>
+          <div class="series-results hidden" id="series-results">
+            <div class="series-winner" id="series-winner"></div>
+            <div class="series-chips" id="series-chips"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -4048,6 +4302,7 @@ try {
   function renderStandings() {
     if (!standingsBody) return;
     const teams = buildTeamAggregates();
+    updatePredictCenter(teams); // refresh Prediction Center with latest power ratings
 
     if (standingsTab === "leaders") {
       renderLeagueLeaders(teams);
@@ -4684,7 +4939,7 @@ try {
   });
 
   // Highlight nav link as user scrolls
-  var sectionIds = ["section-leaders", "section-standings", "section-favorites", "section-players", "section-game"];
+  var sectionIds = ["section-leaders", "section-standings", "section-favorites", "section-players", "section-game", "section-predict"];
   function updateActiveNav() {
     var scrollY = window.scrollY + 140;
     var current = sectionIds[0];
@@ -4974,6 +5229,179 @@ try {
   if (rollBtn) rollBtn.addEventListener("click", doRoll);
   if (predictBtn) predictBtn.addEventListener("click", showResult);
   if (resetGameBtn) resetGameBtn.addEventListener("click", resetGame);
+
+  // ====================================================================
+  // PREDICTION CENTER
+  // ====================================================================
+  var seasonTeamSel = document.getElementById("season-team");
+  var offSlider = document.getElementById("off-slider");
+  var defSlider = document.getElementById("def-slider");
+  var offValEl = document.getElementById("off-val");
+  var defValEl = document.getElementById("def-val");
+  var seasonWinsEl = document.getElementById("season-wins");
+  var seasonLossesEl = document.getElementById("season-losses");
+  var seasonNoteEl = document.getElementById("season-note");
+  var seasonBarEl = document.getElementById("season-bar");
+  var vsTeamASel = document.getElementById("vs-team-a");
+  var vsTeamBSel = document.getElementById("vs-team-b");
+  var vsNameAEl = document.getElementById("vs-name-a");
+  var vsNameBEl = document.getElementById("vs-name-b");
+  var vsBarEl = document.getElementById("vs-bar");
+  var vsPctAEl = document.getElementById("vs-pct-a");
+  var vsPctBEl = document.getElementById("vs-pct-b");
+  var vsH2HEl = document.getElementById("vs-h2h");
+  var simSeriesBtn = document.getElementById("sim-series-btn");
+  var seriesResultsEl = document.getElementById("series-results");
+  var seriesWinnerEl = document.getElementById("series-winner");
+  var seriesChipsEl = document.getElementById("series-chips");
+
+  // League stats refreshed whenever standings recompute (live data)
+  var predLeague = { teams: [], avg: 0, std: 1, byCode: {} };
+
+  function updatePredictCenter(teams) {
+    if (!teams || !teams.length || !seasonTeamSel) return;
+    predLeague.teams = teams;
+    predLeague.byCode = {};
+    var n = teams.length, sum = 0, i;
+    for (i = 0; i < n; i++) {
+      predLeague.byCode[teams[i].code] = teams[i];
+      sum += teams[i].power;
+    }
+    var avg = sum / n;
+    var sq = 0;
+    for (i = 0; i < n; i++) sq += Math.pow(teams[i].power - avg, 2);
+    predLeague.avg = avg;
+    predLeague.std = Math.sqrt(sq / n) || 1;
+    populatePredictSelects();
+    renderSeasonPredict();
+    renderMatchup();
+  }
+
+  function populatePredictSelects() {
+    var html = "";
+    predLeague.teams.forEach(function (t) {
+      html += '<option value="' + t.code + '">' + esc(t.teamName) + " (" + t.code + ")</option>";
+    });
+    // Season select — keep user's choice if still valid
+    var curSeason = seasonTeamSel.value;
+    seasonTeamSel.innerHTML = html;
+    if (curSeason && predLeague.byCode[curSeason]) seasonTeamSel.value = curSeason;
+    else seasonTeamSel.value = predLeague.teams[0].code;
+
+    // VS selects — default to top two power teams on first populate
+    var curA = vsTeamASel.value, curB = vsTeamBSel.value;
+    vsTeamASel.innerHTML = html;
+    vsTeamBSel.innerHTML = html;
+    if (curA && predLeague.byCode[curA]) vsTeamASel.value = curA;
+    else if (predLeague.teams[1]) vsTeamASel.value = predLeague.teams[1].code;
+    if (curB && predLeague.byCode[curB]) vsTeamBSel.value = curB;
+    else vsTeamBSel.value = predLeague.teams[0].code;
+  }
+
+  function effPower(team, offBoost, defBoost) {
+    // Offense adds scoring punch; defense suppresses opponents (both lift power)
+    return team.power + offBoost * 2.2 + defBoost * 1.8;
+  }
+
+  function renderSeasonPredict() {
+    var code = seasonTeamSel.value;
+    var t = predLeague.byCode[code];
+    if (!t) return;
+    var off = parseInt(offSlider.value, 10) || 0;
+    var def = parseInt(defSlider.value, 10) || 0;
+    var eff = effPower(t, off, def);
+    var z = (eff - predLeague.avg) / predLeague.std;
+    var wins = Math.round(41 + z * 11.5);
+    if (wins < 2) wins = 2;
+    if (wins > 80) wins = 80;
+    var losses = 82 - wins;
+    seasonWinsEl.textContent = wins;
+    seasonLossesEl.textContent = losses;
+    var note = esc(t.teamName) + " &middot; projected win rate " + ((wins / 82) * 100).toFixed(1) + "%";
+    if (off || def) note += " (boosted " + (off >= 0 ? "+" : "") + off + " O / " + (def >= 0 ? "+" : "") + def + " D)";
+    seasonNoteEl.innerHTML = note;
+    var pctW = (wins / 82) * 100;
+    seasonBarEl.style.width = pctW + "%";
+    var barColor;
+    if (wins >= 55) barColor = "linear-gradient(90deg,#4caf50,#8ddb5b)";
+    else if (wins >= 41) barColor = "linear-gradient(90deg,var(--nba-gold),#f6a609)";
+    else barColor = "linear-gradient(90deg,var(--nba-red),#ff6b6b)";
+    seasonBarEl.style.background = barColor;
+  }
+
+  function matchupProb() {
+    var a = predLeague.byCode[vsTeamASel.value];
+    var b = predLeague.byCode[vsTeamBSel.value];
+    if (!a || !b) return null;
+    var diff = a.power - b.power;
+    // Elo-style logistic: one league std of difference ≈ 64% win share
+    var pA = 1 / (1 + Math.pow(10, -diff / (predLeague.std * 0.98)));
+    return { a: a, b: b, pA: Math.min(0.92, Math.max(0.08, pA)) };
+  }
+
+  function renderMatchup() {
+    var m = matchupProb();
+    if (!m) return;
+    var pA = m.pA;
+    vsNameAEl.textContent = m.a.teamName + " (" + m.a.code + ")";
+    vsNameBEl.textContent = m.b.teamName + " (" + m.b.code + ")";
+    vsBarEl.style.width = (pA * 100) + "%";
+    vsPctAEl.textContent = Math.round(pA * 100) + "%";
+    vsPctBEl.textContent = Math.round((1 - pA) * 100) + "%";
+    var aW = Math.round(82 * pA);
+    vsH2HEl.innerHTML = "Expected head-to-head over 82 games: <b style='color:var(--nba-gold)'>" +
+      aW + " - " + (82 - aW) + "</b>";
+  }
+
+  function simulateSeries() {
+    var m = matchupProb();
+    if (!m) return;
+    var pA = m.pA;
+    var N = 10000;
+    var tally = {}; // key: winner code + score
+    var aSeries = 0, bSeries = 0;
+    for (var s = 0; s < N; s++) {
+      var wa = 0, wb = 0;
+      while (wa < 4 && wb < 4) {
+        if (Math.random() < pA) wa++; else wb++;
+      }
+      if (wa === 4) aSeries++; else bSeries++;
+      var wCode = (wa === 4) ? m.a.code : m.b.code;
+      var score = Math.max(wa, wb) + "-" + Math.min(wa, wb);
+      var key = wCode + " " + score;
+      tally[key] = (tally[key] || 0) + 1;
+    }
+    seriesResultsEl.classList.remove("hidden");
+    var champName = (aSeries >= bSeries) ? m.a.teamName : m.b.teamName;
+    var champPct = Math.round((Math.max(aSeries, bSeries) / N) * 100);
+    seriesWinnerEl.innerHTML = "&#127942; " + esc(champName) + " win the series in " +
+      champPct + "% of simulations (" +
+      Math.round((aSeries / N) * 100) + "% vs " + Math.round((bSeries / N) * 100) + "%)";
+    // chips sorted by frequency desc
+    var keys = Object.keys(tally).sort(function (x, y) { return tally[y] - tally[x]; });
+    var chipsHtml = "";
+    keys.forEach(function (k) {
+      var isWinnerSide = k.indexOf((aSeries >= bSeries) ? m.a.code : m.b.code) === 0;
+      chipsHtml += '<span class="series-chip' + (isWinnerSide ? " winner" : "") + '">' +
+        esc(k) + " &middot; " + ((tally[k] / N) * 100).toFixed(1) + "%</span>";
+    });
+    seriesChipsEl.innerHTML = chipsHtml;
+  }
+
+  if (seasonTeamSel) {
+    seasonTeamSel.addEventListener("change", renderSeasonPredict);
+    offSlider.addEventListener("input", function () {
+      offValEl.textContent = (offSlider.value >= 0 ? "+" : "") + offSlider.value;
+      renderSeasonPredict();
+    });
+    defSlider.addEventListener("input", function () {
+      defValEl.textContent = (defSlider.value >= 0 ? "+" : "") + defSlider.value;
+      renderSeasonPredict();
+    });
+    vsTeamASel.addEventListener("change", renderMatchup);
+    vsTeamBSel.addEventListener("change", renderMatchup);
+    if (simSeriesBtn) simSeriesBtn.addEventListener("click", simulateSeries);
+  }
 
   // ---------- Init ----------
   window.renderNBA = function () {
